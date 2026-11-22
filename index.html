@@ -95,9 +95,11 @@ const KEY='kadenHotel2';
 const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'],['m',-1,2,'room'],['m',1,2,'snack'],['m',-1,3,'room'],['m',1,3,'room'],
  ['n',0,'room'],['n',-5,'room'],['n',5,'loo'],['s',-10.5,'room'],['s',10.5,'snack'],['n',-10,'room'],['n',10,'room'],['s',-15.5,'loo'],['s',15.5,'room'],['n',-15,'room'],['n',15,'snack']];
 const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9];
-const DEF={coins:0,pile:0,built:[1,1],sp:{},stalls:[1,0,0],recep:0,shauna:0,jay:0,sfast:0,jfast:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
+const DEF={coins:0,pile:0,built:[1,1],sp:{},stalls:[1,0,0],recep:0,maids:0,jans:0,sfast:0,jfast:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
 let G=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object.assign(G,s)}catch(e){}
+// older saves had one Shauna and one Jay
+if(G.shauna&&!G.maids)G.maids=1;if(G.jay&&!G.jans)G.jans=1;delete G.shauna;delete G.jay;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}};
 const LEVELS=[0,3,8,15,24,35,50,70,95,125,160,200,250,310,380];
 const level=()=>LEVELS.filter(t=>G.served>=t).length;
@@ -342,18 +344,24 @@ let carrying=0,rollsFlying=0,sprays=5,spraysFlying=0,bump=0;
 const CAP=()=>G.bag?8:4,SCAP=()=>G.bag?8:5;
 const backCount=()=>Math.min(24,Math.ceil(G.coins/5));
 
-/* ---------- staff: Shauna (cleaner), Jay (toilet paper), receptionist ---------- */
+/* ---------- staff: maids clean rooms, janitors stock the toilets, receptionist checks guests in ---------- */
 let recep=null;function addRecep(){recep=person('#4cb050','#2b2140','#8d5a3b','#2b2140','#e2366b');recep.position.set(DX-1.2,0,DZ-1.4)}
 if(G.recep)addRecep();
 const SKIN=['#f2c39b','#c68e63','#8d5a3b','#ffd9b8','#e0a878'];
-let shauna=null,jay=null;
+// each hire costs more and needs a higher hotel level
+const MAIDS=[{n:'Shauna',hair:'#c1440e',skin:'#f6d2b8',eyes:'#2e7d32',lv:4,cost:100},{n:'Molly',hair:'#e0b04a',skin:'#ffd9b8',lv:6,cost:200},
+ {n:'Aoife',hair:'#5a3a22',skin:'#f2c39b',lv:8,cost:350},{n:'Rosa',hair:'#2b2140',skin:'#c68e63',lv:10,cost:500},{n:'Niamh',hair:'#d9772b',skin:'#f6d2b8',lv:12,cost:700}];
+const JANS=[{n:'Jay',hair:'#5a3a22',skin:'#e0a878',suit:'#2f5fa7',shirt:'#e94b3c',lv:6,cost:120},{n:'Paddy',hair:'#b5523b',skin:'#ffd9b8',suit:'#2e8b3a',shirt:'#ffd23f',lv:8,cost:250},
+ {n:'Tom',hair:'#111111',skin:'#8d5a3b',suit:'#ff9f43',shirt:'#ffffff',lv:10,cost:400},{n:'Seán',hair:'#e0b04a',skin:'#f2c39b',suit:'#7b2cbf',shirt:'#9bd4ff',lv:12,cost:600}];
+const MHOME=[{x:1.2,z:-.9},{x:-1.2,z:-.9},{x:1.2,z:-1.8},{x:-1.2,z:-1.8},{x:0,z:-1.3}],JHOME=[{x:11,z:8.8},{x:9.6,z:8.8},{x:12.4,z:8.8},{x:8.2,z:8.8}];
+const maids=[],jans=[];
 function nameTag(n,bg){const l=label(n,bg,.75);return l}
-function addShauna(){const m=person('#1d1d1d','#c1440e','#f6d2b8','#1d1d1d','band',{maid:true,longHair:true,eyes:'#2e7d32'});const home={x:1.2,z:-.9};
- m.position.set(home.x,0,home.z);shauna={m,home,path:[],state:'idle',room:null,tag:nameTag('Shauna','#1d1d1d')};shauna.tag.position.set(home.x,2.4,home.z)}
-function addJay(){const m=person('#e94b3c','#5a3a22','#e0a878','#2f5fa7',undefined,{overalls:'#2f5fa7'});const home={x:11,z:8.8};m.position.set(home.x,0,home.z);
+function addMaid(){const k=maids.length,d=MAIDS[k],m=person('#1d1d1d',d.hair,d.skin,'#1d1d1d','band',{maid:true,longHair:true,eyes:d.eyes});const home=MHOME[k];
+ m.position.set(home.x,0,home.z);const c={k,m,home,path:[],state:'idle',room:null,tag:nameTag(d.n,'#1d1d1d')};c.tag.position.set(home.x,2.4,home.z);maids.push(c)}
+function addJan(){const k=jans.length,d=JANS[k],m=person(d.shirt,d.hair,d.skin,d.suit,undefined,{overalls:d.suit});const home=JHOME[k];m.position.set(home.x,0,home.z);
  const hg=new THREE.Group();hg.position.set(0,.82,.48);m.add(hg);const rolls=[0,1,2,3].map(k=>{const r=new THREE.Mesh(rollGeo,rollMat);r.position.set((k%2-.5)*.32,(k>>1)*.3,0);hg.add(r);return r});
- jay={m,home,path:[],state:'idle',carry:0,rolls,hg,target:null,t:0,tag:nameTag('Jay','#2f5fa7')};jay.tag.position.set(home.x,2.4,home.z)}
-if(G.shauna)addShauna();if(G.jay)addJay();
+ const s={k,m,home,path:[],state:'idle',carry:0,rolls,hg,target:null,t:0,tag:nameTag(d.n,d.suit)};s.tag.position.set(home.x,2.4,home.z);jans.push(s)}
+for(let k=0;k<G.maids;k++)addMaid();for(let k=0;k<G.jans;k++)addJan();
 
 /* ---------- flying things ---------- */
 const flyers=[];
@@ -374,10 +382,10 @@ const PADS=[
  {id:'stall2',x:15.7,z:7.67,size:1.3,cost:100,icon:'🚽',lv:4,name:'another toilet',show:()=>G.stalls[1]&&!G.stalls[2],buy:()=>{G.stalls[2]=1;openStall(LB.toilets[2])}},
  {id:'shoes',x:7,z:6.2,cost:40,icon:'👟',lv:2,name:'fast shoes',show:()=>!G.shoes,buy:()=>{G.shoes=1;sfx.build()}},
  {id:'bag',x:7,z:6.2,cost:90,icon:'🎒',lv:4,name:'a bigger bag',show:()=>G.shoes&&!G.bag,buy:()=>{G.bag=1;sfx.build()}},
- {id:'shauna',x:7,z:1.4,cost:100,icon:'🧹 Shauna',lv:4,name:'Shauna the cleaner',show:()=>!G.shauna,buy:()=>{G.shauna=1;addShauna();sfx.build()}},
- {id:'sfast',x:7,z:1.4,cost:220,icon:'⚡ Shauna',lv:8,name:'speedy Shauna',show:()=>G.shauna&&!G.sfast,buy:()=>{G.sfast=1;sfx.build()}},
- {id:'jay',x:7,z:3.8,cost:120,icon:'🧻 Jay',lv:6,name:'Jay the toilet helper',show:()=>!G.jay,buy:()=>{G.jay=1;addJay();sfx.build()}},
- {id:'jfast',x:7,z:3.8,cost:220,icon:'⚡ Jay',lv:9,name:'speedy Jay',show:()=>G.jay&&!G.jfast,buy:()=>{G.jfast=1;sfx.build()}},
+ ...MAIDS.map((d,k)=>({id:'maid'+k,x:7,z:1.4,cost:d.cost,icon:'🧹 '+d.n,lv:d.lv,name:d.n+' the maid',show:()=>G.maids===k,buy:()=>{G.maids=k+1;addMaid();sfx.build()}})),
+ ...JANS.map((d,k)=>({id:'jan'+k,x:7,z:3.8,cost:d.cost,icon:'🧻 '+d.n,lv:d.lv,name:d.n+' the janitor',show:()=>G.jans===k,buy:()=>{G.jans=k+1;addJan();sfx.build()}})),
+ {id:'sfast',x:3.6,z:6.2,cost:220,icon:'⚡ Maids',lv:7,name:'speedy maids',show:()=>G.maids>0&&!G.sfast,buy:()=>{G.sfast=1;sfx.build()}},
+ {id:'jfast',x:3.6,z:6.2,cost:220,icon:'⚡ Janitors',lv:9,name:'speedy janitors',show:()=>G.sfast&&G.jans>0&&!G.jfast,buy:()=>{G.jfast=1;sfx.build()}},
  {id:'recep',x:3.6,z:3.8,cost:150,icon:'💁',lv:5,name:'a receptionist',show:()=>!G.recep,buy:()=>{G.recep=1;addRecep();sfx.build()}},
  {id:'beds1',x:3.6,z:1.4,cost:120,icon:'✨',lv:4,name:'comfy beds',show:()=>G.beds<1,buy:()=>{G.beds=1;styleBeds();sfx.build()}},
  {id:'beds2',x:3.6,z:1.4,cost:300,icon:'📺',lv:7,name:'TVs in every room',show:()=>G.beds===1,buy:()=>{G.beds=2;styleBeds();sfx.build()}}];
@@ -485,9 +493,8 @@ const near=(x,z,r,m=player)=>Math.hypot(m.position.x-x,m.position.z-z)<r;
 const inCloset=()=>player.position.x<-10.3&&player.position.z>3.3&&player.position.z<7.7;
 
 /* ---------- staff brains ---------- */
-const HOMEC={cross:false,cp:{x:1.2,z:-.9}};
-function stepShauna(dt){const c=shauna;if(!c)return;const sp=G.sfast?5:3.6;
- if(c.state==='idle'){const r=rooms.find(r=>r.dirty&&!r.claim);if(r){r.claim=c;c.room=r;c.state='go';c.path=[...between(HOMEC,r.p),r.p.din,LP(r.p,2.4,.8)]}}
+function stepMaid(c,dt){const sp=G.sfast?5:3.6,HOMEC={cross:false,cp:c.home};
+ if(c.state==='idle'){const r=rooms.find(r=>r.dirty&&!r.claim);if(r){r.claim=c;c.room=r;c.state='go';c.path=[...between(HOMEC,r.p),r.p.din,LP(r.p,2.4,[.8,-.8,0][c.k%3])]}}
  const arrived=walk(c,dt,sp);
  const goHome=r=>{c.state='home';c.m.rotation.y=0;c.path=[r.p.din,r.p.cp,...between(r.p,HOMEC)];c.room=null};
  if(c.state==='go'&&!c.room.dirty)goHome(c.room);
@@ -498,7 +505,7 @@ function stepShauna(dt){const c=shauna;if(!c)return;const sp=G.sfast?5:3.6;
 const jayTo=b=>b.lobby?[BDOOR,b.zone]:[{x:0,z:1},...between(LOBBY,b.p),b.zone];
 const needs=b=>b.toilets.filter(t=>t.open()&&t.paper+t.incoming<4);
 const lowest=b=>Math.min(...b.toilets.filter(t=>t.open()).map(t=>t.paper));
-function stepJay(dt){const s=jay;if(!s)return;const sp=G.jfast?5:3.6;s.hold=s.carry>0;s.rolls.forEach((m,k)=>m.visible=k<s.carry);
+function stepJan(s,dt){const sp=G.jfast?5:3.6;s.hold=s.carry>0;s.rolls.forEach((m,k)=>m.visible=k<s.carry);
  const need=baths.filter(b=>needs(b).length&&(!b.claim||b.claim===s));
  const arrived=walk(s,dt,sp);
  if(s.state==='idle'&&need.length){s.target=need.sort((a,b)=>lowest(a)-lowest(b))[0];s.target.claim=s;
@@ -591,7 +598,7 @@ function step(dt){
   if(g.state==='sleep'){g.t-=dt;if(g.t<=0)leaveRoom(g)}
   if(g.state==='loo'){g.t-=dt;if(g.t<=0)finishLoo(g)}});
  guests=guests.filter(g=>{if(g.dead){scene.remove(g.m);killLabel(g.icon);return false}return true});
- stepShauna(dt);stepJay(dt);
+ maids.forEach(c=>stepMaid(c,dt));jans.forEach(s=>stepJan(s,dt));
  stepFlyers(dt);
 
  ring.visible=ringP>=0;if(ringP>=0){setRing(Math.min(1,ringP));ring.position.set(P.x,2.7,P.z)}
@@ -611,7 +618,7 @@ function step(dt){
  else if(plotReady){const pp=LP(pl,-1,0);setHint(`You can build ${NAME[pl.type]}! Stand on the green square ${ICON[pl.type]}`,pp.x,pp.z)}
  else if(pad)setHint(`You have enough cash for ${pad.name}! Stand on the green square`,pad.x,pad.z);
  else if(snacks.some(s=>G.sp[s.i]>=20)){const s=snacks.find(s=>G.sp[s.i]>=20);setHint('The snack bar made cash! 🥤',s.px,s.pz)}
- else if(low&&!carrying&&low.paper<2&&!jay)setHint('Toilet paper is running low 🧻',CLOSET.x,CLOSET.z);
+ else if(low&&!carrying&&low.paper<2&&!jans.length)setHint('Toilet paper is running low 🧻',CLOSET.x,CLOSET.z);
  else setHint(atDesk?'Wait here for guests 🛎️':'Go stand behind the desk for the next guest 🛎️',atDesk?undefined:DX,DZ-1.5);
 
  const asp=innerWidth/innerHeight,want=asp<1?14:19,D=Math.max(16,Math.min(32,want/2/(Math.tan(21*Math.PI/180)*asp)));
