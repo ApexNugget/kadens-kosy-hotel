@@ -37,8 +37,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 .btn{touch-action:manipulation;pointer-events:auto;background:#e2366b;color:#fff;border:3px solid #7a1236;border-radius:12px;padding:6px 12px;font:inherit;font-size:20px;box-shadow:0 4px 0 #0004;min-height:46px;min-width:46px;cursor:pointer}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0004}
 .btn.small{font-size:14px;background:#fffaf0;color:#2b2140;border-color:#3b2a1a}
-.joy{position:fixed;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:#ffffff40;border:4px solid #ffffffaa;pointer-events:none;display:none}
-.joy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px;border-radius:50%;background:#fff;box-shadow:0 4px 0 #0003}
+#inf{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));width:170px;translate:-50% 0;pointer-events:none;opacity:.6;transition:opacity .4s;filter:drop-shadow(0 3px 0 #0004)}
+#inf.off{opacity:0}
 .fx{position:fixed;z-index:5;pointer-events:none;font-size:26px;color:#fff;text-shadow:0 2px 0 #0008;animation:up 1s ease-out forwards;translate:-50% -50%;white-space:nowrap}
 .fx.big{font-size:46px;animation-duration:2s}
 .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0006;z-index:9}
@@ -72,7 +72,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
  <button class="btn small" id="reset">Start over</button>
 </div>
-<div class="joy" id="joy"><i></i></div>
+<svg id="inf" viewBox="0 0 200 100" aria-hidden="true"><path id="infp" d="M100,50 C125,15 175,15 175,50 C175,85 125,85 100,50 C75,15 25,15 25,50 C25,85 75,85 100,50Z" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+ <circle r="13" fill="#ffd23f" stroke="#3b2a1a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#infp"/></animateMotion></circle></svg>
 <div class="modal" id="start"><div class="card">
  <h1>Kaden's Kosy Hotel</h1>
  <p>Put your finger on the screen and slide it to walk.</p>
@@ -345,8 +346,9 @@ const CAP=()=>G.bag?8:4,SCAP=()=>G.bag?8:5;
 const backCount=()=>Math.min(24,Math.ceil(G.coins/5));
 
 /* ---------- staff: maids clean rooms, janitors stock the toilets, receptionist checks guests in ---------- */
-let recep=null;function addRecep(){recep=person('#4cb050','#2b2140','#8d5a3b','#2b2140','#e2366b');recep.position.set(DX-1.2,0,DZ-1.4)}
-if(G.recep)addRecep();
+const RECEPS=[{n:'Ciara',hair:'#2b2140',skin:'#8d5a3b',lv:5,cost:150,x:-1.7},{n:'Liam',hair:'#e0b04a',skin:'#f2c39b',lv:9,cost:350,x:1.7},{n:'Emma',hair:'#b5523b',skin:'#ffd9b8',lv:13,cost:600,x:2.8}];
+const receps=[];function addRecep(){const k=receps.length,d=RECEPS[k],m=person('#4cb050',d.hair,d.skin,'#2b2140','#e2366b');m.position.set(DX+d.x,0,DZ-1.4);
+ const tag=nameTag(d.n,'#4cb050');tag.position.set(DX+d.x,2.4,DZ-1.4);receps.push({m,tag})}
 const SKIN=['#f2c39b','#c68e63','#8d5a3b','#ffd9b8','#e0a878'];
 // each hire costs more and needs a higher hotel level
 const MAIDS=[{n:'Shauna',hair:'#c1440e',skin:'#f6d2b8',eyes:'#2e7d32',lv:4,cost:100},{n:'Molly',hair:'#e0b04a',skin:'#ffd9b8',lv:6,cost:200},
@@ -361,7 +363,7 @@ function addMaid(){const k=maids.length,d=MAIDS[k],m=person('#1d1d1d',d.hair,d.s
 function addJan(){const k=jans.length,d=JANS[k],m=person(d.shirt,d.hair,d.skin,d.suit,undefined,{overalls:d.suit});const home=JHOME[k];m.position.set(home.x,0,home.z);
  const hg=new THREE.Group();hg.position.set(0,.82,.48);m.add(hg);const rolls=[0,1,2,3].map(k=>{const r=new THREE.Mesh(rollGeo,rollMat);r.position.set((k%2-.5)*.32,(k>>1)*.3,0);hg.add(r);return r});
  const s={k,m,home,path:[],state:'idle',carry:0,rolls,hg,target:null,t:0,tag:nameTag(d.n,d.suit)};s.tag.position.set(home.x,2.4,home.z);jans.push(s)}
-for(let k=0;k<G.maids;k++)addMaid();for(let k=0;k<G.jans;k++)addJan();
+for(let k=0;k<G.maids;k++)addMaid();for(let k=0;k<G.jans;k++)addJan();for(let k=0;k<G.recep;k++)addRecep();
 
 /* ---------- flying things ---------- */
 const flyers=[];
@@ -386,7 +388,7 @@ const PADS=[
  ...JANS.map((d,k)=>({id:'jan'+k,x:7,z:3.8,cost:d.cost,icon:'🧻 '+d.n,lv:d.lv,name:d.n+' the janitor',show:()=>G.jans===k,buy:()=>{G.jans=k+1;addJan();sfx.build()}})),
  {id:'sfast',x:3.6,z:6.2,cost:220,icon:'⚡ Maids',lv:7,name:'speedy maids',show:()=>G.maids>0&&!G.sfast,buy:()=>{G.sfast=1;sfx.build()}},
  {id:'jfast',x:3.6,z:6.2,cost:220,icon:'⚡ Janitors',lv:9,name:'speedy janitors',show:()=>G.sfast&&G.jans>0&&!G.jfast,buy:()=>{G.jfast=1;sfx.build()}},
- {id:'recep',x:3.6,z:3.8,cost:150,icon:'💁',lv:5,name:'a receptionist',show:()=>!G.recep,buy:()=>{G.recep=1;addRecep();sfx.build()}},
+ ...RECEPS.map((d,k)=>({id:'recep'+k,x:3.6,z:3.8,cost:d.cost,icon:'💁 '+d.n,lv:d.lv,name:d.n+' the receptionist',show:()=>G.recep===k,buy:()=>{G.recep=k+1;addRecep();sfx.build()}})),
  {id:'beds1',x:3.6,z:1.4,cost:120,icon:'✨',lv:4,name:'comfy beds',show:()=>G.beds<1,buy:()=>{G.beds=1;styleBeds();sfx.build()}},
  {id:'beds2',x:3.6,z:1.4,cost:300,icon:'📺',lv:7,name:'TVs in every room',show:()=>G.beds===1,buy:()=>{G.beds=2;styleBeds();sfx.build()}}];
 PADS.forEach(p=>{Object.assign(p,makePad(p.x,p.z,p.size||1.8));p.lbl.position.set(p.x,1.8,p.z)});
@@ -475,10 +477,10 @@ function levelUp(){const L=level(),bonus=10*L;sfx.level();G.pile+=bonus;drawPile
 /* ---------- input ---------- */
 const joy={on:false,id:null,x:0,y:0,dx:0,dy:0},keys={};
 $('stage').addEventListener('pointerdown',e=>{if(joy.on)return;joy.on=true;joy.id=e.pointerId;joy.x=e.clientX;joy.y=e.clientY;joy.dx=joy.dy=0;
- const j=$('joy');j.style.left=e.clientX+'px';j.style.top=e.clientY+'px';j.style.display='block';j.firstElementChild.style.transform=''});
+ $('inf').classList.add('off')});
 addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;let dx=e.clientX-joy.x,dy=e.clientY-joy.y;const l=Math.hypot(dx,dy),m=50;
- if(l>m){dx*=m/l;dy*=m/l}joy.dx=dx/m;joy.dy=dy/m;$('joy').firstElementChild.style.transform=`translate(${dx}px,${dy}px)`});
-function endJoy(e){if(e.pointerId!==joy.id)return;joy.on=false;joy.dx=joy.dy=0;$('joy').style.display='none'}
+ if(l>m){dx*=m/l;dy*=m/l}joy.dx=dx/m;joy.dy=dy/m});
+function endJoy(e){if(e.pointerId!==joy.id)return;joy.on=false;joy.dx=joy.dy=0;$('inf').classList.remove('off')}
 addEventListener('pointerup',endJoy);addEventListener('pointercancel',endJoy);
 addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
 function collide(p){for(const c of C){if(!c.on)continue;const nx=Math.max(c.x1,Math.min(p.x,c.x2)),nz=Math.max(c.z1,Math.min(p.z,c.z2));
@@ -547,8 +549,8 @@ function step(dt){
  spawnT-=dt;if(spawnT<=0){if(Q.length<4&&guests.length<20)spawn();spawnT=Math.max(2.2,8-rooms.length*.5)+Math.random()*2}
 
  const atDesk=near(DX,DZ-1.5,1.3),front=Q[0],fr=freeRoom();
- if(front&&front.arrived&&fr&&(atDesk||recep)){ck+=dt/(atDesk?.8:2.2);if(atDesk)ringP=ck;if(ck>=1){ck=0;checkIn()}}else ck=0;
- deskIcon.visible=!!(front&&front.arrived&&!atDesk&&!recep);deskIcon.position.set(DX,3+Math.sin(now/180)*.15,DZ-1.4);
+ const nr=receps.length;if(front&&front.arrived&&fr&&(atDesk||nr)){ck+=dt/(atDesk?.8:2.4/nr);if(atDesk)ringP=ck;if(ck>=1){ck=0;checkIn()}}else ck=0;
+ deskIcon.visible=!!(front&&front.arrived&&!atDesk&&!nr);deskIcon.position.set(DX,3+Math.sin(now/180)*.15,DZ-1.4);
 
  pileT+=dt;
  const grab=(get,set,px,pz,draw)=>{if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
@@ -607,7 +609,7 @@ function step(dt){
  const pad=PADS.find(p=>padOn(p)&&G.coins>=p.cost-(G.paid[p.id]||0));
  const plotReady=pl&&!plotLocked&&G.coins>=plotCost(ni)-(G.paid['plot'+ni]||0);
  const dc=dirty&&LP(dirty.p,3,0);
- if(front&&front.arrived&&fr&&!recep&&!atDesk)setHint('A guest is waiting! Stand behind the desk 🛎️',DX,DZ-1.5);
+ if(front&&front.arrived&&fr&&!nr&&!atDesk)setHint('A guest is waiting! Stand behind the desk 🛎️',DX,DZ-1.5);
  else if(pu)setHint(`Something appeared! Walk onto the ${PU[pu.type].icon}`,pu.x,pu.z);
  else if(dirty&&!sprays&&!inCloset())setHint('Out of spray! Get some from the closet 🧴',CLOSET.x,CLOSET.z);
  else if(front&&front.arrived&&!fr&&dirty)setHint('No clean rooms! Walk into a messy room to clean it 🧹',dc.x,dc.z);
