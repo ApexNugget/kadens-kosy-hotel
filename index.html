@@ -96,7 +96,7 @@ const KEY='kadenHotel2';
 const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'],['m',-1,2,'room'],['m',1,2,'snack'],['m',-1,3,'room'],['m',1,3,'room'],
  ['n',0,'room'],['n',-5,'room'],['n',5,'loo'],['s',-10.5,'room'],['s',10.5,'snack'],['n',-10,'room'],['n',10,'room'],['s',-15.5,'loo'],['s',15.5,'room'],['n',-15,'room'],['n',15,'snack']];
 const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9];
-const DEF={coins:0,pile:0,built:[1,1],sp:{},stalls:[1,0,0],recep:0,maids:0,jans:0,sfast:0,jfast:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
+const DEF={coins:0,pile:0,built:[1,1],sp:{},rt:{},stalls:[1,0,0],recep:0,maids:0,jans:0,sfast:0,jfast:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
 let G=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object.assign(G,s)}catch(e){}
 // older saves had one Shauna and one Jay
@@ -253,16 +253,27 @@ function makePile(px,pz,n){const g=new THREE.Group();scene.add(g);const arr=[];
  for(let k=0;k<n;k++){const s=k%8,lv=k/8|0;const m=new THREE.Mesh(billGeo,billMat);m.castShadow=true;m.position.set(px+(s%2-.5)*.64,.05+lv*.1,pz+((s>>1)-1.5)*.36);g.add(m);arr.push(m)}
  const l=label('$0','#4cb050',1);l.position.set(px,2,pz);return{arr,l}}
 function buildRoom(p){const i=p.i;p.floor.material=tm('wool:'+WOOL[i],3,2.5);const bed=new THREE.Group();scene.add(bed);
- bx(p,2.8,.45,1.8,tm('plank:#a0662f',2,.4),4.5,.22,0,bed);bx(p,2.7,.25,1.7,'#ffffff',4.5,.55,0,bed);
+ const frame=bx(p,2.8,.45,1.8,tm('plank:#a0662f',2,.4),4.5,.22,0,bed);bx(p,2.7,.25,1.7,'#ffffff',4.5,.55,0,bed);
  const blanket=bx(p,1.7,.14,1.76,tm('wool:'+WOOL[(i+5)%NP],1.5,1.5),4,.72,0,bed);bx(p,.5,.2,1.1,'#fff7ea',5.3,.76,0,bed);
- bx(p,.25,1.3,1.9,tm('plank:#7a4a22',.3,1),5.85,.65,0,bed);
+ const head=bx(p,.25,1.3,1.9,tm('plank:#7a4a22',.3,1),5.85,.65,0,bed);
  bx(p,.6,.6,.6,tm('plank:#c58b4a',.5,.5),5.4,.3,1.7,bed);bx(p,.24,.3,.24,'#ffd23f',5.4,.75,1.7,bed);
  bx(p,.9,.05,.9,tm('wool:'+WOOL[(i+3)%NP]),1.6,.04,-1.2,bed);
  const tv=new THREE.Group();bed.add(tv);bx(p,.9,.6,.5,tm('plank:#7a4a22',.6,.5),2.3,.3,-2,tv);bx(p,1,.6,.1,'#222831',2.3,.95,-2.1,tv);bx(p,.85,.45,.02,'#4dd2d2',2.3,.95,-2.04,tv);
  const mess=new THREE.Group();scene.add(mess);
  [['#ff5a5a',1.2,-1.4],['#ffd23f',2.4,1.3],['#5a8cff',1.6,.9],['#a0522d',3,-1.6],['#ffffff',2.3,-.2]].forEach(([c,du,dv],q)=>{const m=bx(p,.35,.2,.35,c,du,.1,dv,mess);m.rotation.y=q*.7});
  mess.visible=false;const icon=label('🧹',undefined,1.1),ic=LP(p,3,0);icon.position.set(ic.x,3,ic.z);icon.visible=false;
- rooms.push({i,p,bed,tv,blanket,mess,icon,occ:null,dirty:false,prog:0,claim:null});rooms.sort((a,b)=>a.i-b.i);styleBeds()}
+ // room upgrades: ★2 plant and picture, ★3 armchair and lamp, ★4 golden bed
+ const t2=new THREE.Group(),t3=new THREE.Group();bed.add(t2);bed.add(t3);
+ bx(p,.4,.4,.4,tm('plank:#a0662f',.4,.4),5.4,.2,-1.9,t2);bx(p,.6,.6,.6,tm('wool:#3f9f3a'),5.4,.7,-1.9,t2);bx(p,.2,.2,.2,'#ff4d4d',5.4,1.05,-1.9,t2);
+ bx(p,1.3,.8,.06,'#ffd23f',4.4,1.15,-2.3,t2);bx(p,1.1,.6,.07,tm('wool:#5aa9e6'),4.4,1.15,-2.3,t2);
+ bx(p,.8,.4,.8,tm('wool:#e2366b'),3.3,.2,1.85,t3);bx(p,.8,.6,.2,tm('wool:#e2366b'),3.3,.6,2.15,t3);bx(p,.15,1.2,.15,'#2b2140',2.4,.6,2.1,t3);bx(p,.4,.3,.4,'#fff3c4',2.4,1.3,2.1,t3);
+ const pp=LP(p,1.3,1.75),pad=makePad(pp.x,pp.z,1.1);pad.lbl.scale.set(1.9,.95,1);pad.lbl.position.set(pp.x,1.6,pp.z);
+ const r={i,p,bed,tv,blanket,mess,icon,frame,head,t2,t3,pad,px:pp.x,pz:pp.z,occ:null,dirty:false,prog:0,claim:null};
+ rooms.push(r);rooms.sort((a,b)=>a.i-b.i);styleBeds();applyTier(r)}
+const TIERX=[0,1,1.5,2,2.6],TIERC=[0,0,60,150,300];
+const tierOf=r=>G.rt[r.i]||1;
+function applyTier(r){const t=tierOf(r);r.t2.visible=t>=2;r.t3.visible=t>=3;
+ const gold=t>=4;r.frame.material=gold?mat('#ffcf2e'):tm('plank:#a0662f',2,.4);r.head.material=gold?mat('#ffcf2e'):tm('plank:#7a4a22',.3,1)}
 function rollsAt(x,z){return[0,1,2,3].map(k=>{const m=new THREE.Mesh(rollGeo,rollMat);m.position.set(x,.12+k*.28,z);scene.add(m);return m})}
 // a corridor bathroom: two stalls side by side, walk in and the paper goes to them
 function buildLoo(p){p.floor.material=tm('tile:#bfeaea',4,3);wallP(p,3.6,0,6,0,'tile:#e8f4f4');
@@ -452,7 +463,7 @@ const freeRoom=()=>rooms.find(r=>!r.occ&&!r.dirty);
 const cashX=()=>boost.cash>0?2:1;
 function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;g.room=r;g.state='toRoom';g.arrived=false;
  g.path=[{x:-1.2,z:DZ+1.7},{x:0,z:1},...between(LOBBY,r.p),r.p.din,LP(r.p,3,0)];
- const pay=[10,15,22][G.beds]*(g.vip?3:1)*cashX();
+ const pay=Math.round([10,15,22][G.beds]*TIERX[tierOf(r)])*(g.vip?3:1)*cashX();
  fly(billGeo,billMat,g.m.position.clone().setY(1.2),()=>W3(PX,.6,PZ),.5,()=>{G.pile+=pay;drawPile();sfx.cash()});
  sfx.ding();fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
  Q.forEach((q,i)=>{q.path=[slot(i)];q.arrived=false});save()}
@@ -577,6 +588,10 @@ function step(dt){
   if(sprays>0){r.prog+=dt/1.6;ringP=r.prog;if(r.prog>=1){sprays--;cleanRoom(r)}}
   else if(warnT<=0){warnT=2.5;fxAt(P.x,2.4,P.z,'Need spray! 🧴');sfx.no()}});
 
+ // room upgrade squares (from hotel level 3)
+ rooms.forEach(r=>{const t=tierOf(r),on=t<4&&level()>=3;r.pad.mesh.visible=on;r.pad.lbl.visible=on&&near(r.px,r.pz,7);if(!on)return;
+  const id='rt'+r.i,cost=TIERC[t+1];setLabel(r.pad.lbl,`⬆️ ★${t+1} $${cost-(G.paid[id]||0)}`);
+  const pr=payPad(r.pad,r.px,r.pz,cost,id,()=>{G.rt[r.i]=t+1;applyTier(r);sfx.build()},dt);if(pr>=0)ringP=pr});
  PADS.forEach(p=>{const sh=!!p.show(),lk=level()<p.lv;p.mesh.visible=p.lbl.visible=sh&&(!lk||p.lv<=level()+2);if(!sh)return;
   p.mesh.children[1].material=lk?mat('#9a9a9a'):tm('wool:#4cb050');
   if(lk){setLabel(p.lbl,p.icon+' 🔒 Lv '+p.lv,'#dddddd');return}
@@ -619,6 +634,7 @@ function step(dt){
  else if(G.pile>=10)setHint('Grab the cash by the desk 💵',PX,PZ);
  else if(plotReady){const pp=LP(pl,-1,0);setHint(`You can build ${NAME[pl.type]}! Stand on the green square ${ICON[pl.type]}`,pp.x,pp.z)}
  else if(pad)setHint(`You have enough cash for ${pad.name}! Stand on the green square`,pad.x,pad.z);
+ else if(level()>=3&&rooms.some(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1])){const r=rooms.find(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1]);setHint('Make a room fancier so guests pay more! ⬆️',r.px,r.pz)}
  else if(snacks.some(s=>G.sp[s.i]>=20)){const s=snacks.find(s=>G.sp[s.i]>=20);setHint('The snack bar made cash! 🥤',s.px,s.pz)}
  else if(low&&!carrying&&low.paper<2&&!jans.length)setHint('Toilet paper is running low 🧻',CLOSET.x,CLOSET.z);
  else setHint(atDesk?'Wait here for guests 🛎️':'Go stand behind the desk for the next guest 🛎️',atDesk?undefined:DX,DZ-1.5);
