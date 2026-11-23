@@ -51,7 +51,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0006;z-index:9}
 [hidden]{display:none!important}
 .card{position:relative;background:linear-gradient(#fffef9,#f6ecd4);border:4px solid #3b2a1a;border-radius:22px;padding:20px 22px;width:min(480px,calc(100vw - 32px));text-align:center;box-shadow:0 8px 0 #0004}
-.card h1{margin:0 0 8px;font-size:44px;line-height:1.02;color:#4cb050;-webkit-text-stroke:2px #1f5e22;text-shadow:0 4px 0 #1f5e22;text-wrap:balance}
+.card h1{margin:0 0 8px;font-size:44px;line-height:1.02;color:#4cb050;text-shadow:2px 0px 0 #1f5e22,-2px 0px 0 #1f5e22,0px 2px 0 #1f5e22,0px -2px 0 #1f5e22,2px 2px 0 #1f5e22,-2px -2px 0 #1f5e22,2px -2px 0 #1f5e22,-2px 2px 0 #1f5e22,0 5px 0 #1f5e22;text-wrap:balance}
 .logo{font-size:56px;line-height:1;margin:-6px 0 4px;animation:pulse 2s ease-in-out infinite}
 #start{background:radial-gradient(circle at 50% 40%,#2b6fc2cc,#0b1d3ae6)}
 .tw{position:fixed;color:#ffd23f;pointer-events:none;animation:twinkle2 2s ease-in-out infinite;text-shadow:0 0 12px #ffd23f}
@@ -66,6 +66,18 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 .ans button.wrong{background:#bbb;border-color:#777;animation:shake .3s}
 #mres{min-height:1.4em;font-size:22px}
 @keyframes up{to{transform:translateY(-70px);opacity:0}}
+#goals{position:fixed;left:10px;top:76px;width:min(280px,46vw);z-index:4;pointer-events:none}
+#gh{pointer-events:auto;font:inherit;font-size:16px;font-weight:700;background:linear-gradient(#fffef9,#f1e6cc);border:3px solid #3b2a1a;border-radius:12px;padding:4px 12px;box-shadow:0 3px 0 #0004;color:#2b2140;min-height:40px;cursor:pointer}
+#glist{display:grid;gap:6px;margin-top:6px}
+.goal{pointer-events:auto;background:linear-gradient(#fffef9f2,#f6edd8f2);border:3px solid #3b2a1a;border-radius:14px;padding:6px 10px;box-shadow:0 3px 0 #0004;font-size:15px;font-weight:600;line-height:1.25}
+.goal small{font-weight:600;opacity:.65;white-space:nowrap}
+.goal .gb{height:8px;border-radius:5px;background:#0002;overflow:hidden;margin-top:5px}.goal .gb i{display:block;height:100%;background:linear-gradient(90deg,#6fdc78,#2f9e3c);transition:width .3s}
+.goal.done{background:linear-gradient(#fff6c2,#ffd23f);cursor:pointer;animation:pulse 1s ease-in-out infinite}
+.goal.done b{display:block;margin-top:3px;color:#1f5e22}
+#goals.min #glist{display:none}
+#fade{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:7}
+#fade.go{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:0}30%{opacity:.9}100%{opacity:0}}
 .mgr{position:relative;background:linear-gradient(#ffb84d,#ff8c1a);border-color:#8a4a00;font-size:19px}
 .mgr i{position:absolute;top:-9px;right:-9px;width:26px;height:26px;border-radius:50%;background:#e2366b;color:#fff;border:3px solid #fff;font-style:normal;font-size:15px;line-height:20px;text-align:center;animation:pulse 1s infinite}
 #buy{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));translate:-50% 0;display:flex;align-items:center;gap:12px;background:linear-gradient(#fffef9,#f1e6cc);border:3px solid #3b2a1a;border-radius:18px;padding:10px 12px 10px 14px;box-shadow:0 6px 0 #0005;z-index:6;max-width:calc(100vw - 24px);animation:pop .3s cubic-bezier(.2,1.6,.4,1)}
@@ -93,8 +105,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 #lvup{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:8;overflow:hidden}
 #lvup .rays{position:absolute;width:160vmax;height:160vmax;background:repeating-conic-gradient(#ffd23f40 0 9deg,transparent 9deg 18deg);animation:spin 8s linear infinite;-webkit-mask:radial-gradient(circle,#000 0,transparent 55%);mask:radial-gradient(circle,#000 0,transparent 55%)}
 #lvup .lt{position:relative;text-align:center;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
-#lvup b{display:block;font-size:clamp(54px,11vw,100px);line-height:1;color:#ffd23f;-webkit-text-stroke:3px #3b2a1a;text-shadow:0 7px 0 #3b2a1a}
-#lvup small{display:block;margin-top:10px;font-size:clamp(20px,3.6vw,28px);color:#fff;-webkit-text-stroke:1px #3b2a1a;text-shadow:0 3px 0 #3b2a1a}
+#lvup b{display:block;font-size:clamp(54px,11vw,100px);line-height:1;color:#ffd23f;text-shadow:3px 0px 0 #3b2a1a,-3px 0px 0 #3b2a1a,0px 3px 0 #3b2a1a,0px -3px 0 #3b2a1a,3px 3px 0 #3b2a1a,-3px -3px 0 #3b2a1a,3px -3px 0 #3b2a1a,-3px 3px 0 #3b2a1a,0 8px 0 #3b2a1a}
+#lvup small{display:block;margin-top:10px;font-size:clamp(20px,3.6vw,28px);color:#fff;text-shadow:2px 0px 0 #3b2a1a,-2px 0px 0 #3b2a1a,0px 2px 0 #3b2a1a,0px -2px 0 #3b2a1a,2px 2px 0 #3b2a1a,-2px -2px 0 #3b2a1a,2px -2px 0 #3b2a1a,-2px 2px 0 #3b2a1a,0 4px 0 #3b2a1a}
 .conf{position:fixed;top:-50px;pointer-events:none;z-index:8;animation:fall 2.3s ease-in forwards;text-shadow:0 2px 0 #0005}
 @keyframes fall{to{transform:translateY(115vh) rotate(720deg)}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -116,6 +128,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
  <button class="btn small" id="reset">Start over</button>
 </div>
+<div id="goals"><button id="gh">🎯 Goals</button><div id="glist"></div></div>
+<div id="fade"></div>
 <svg id="inf" viewBox="0 0 200 100" aria-hidden="true"><path id="infp" d="M100,50 C125,15 175,15 175,50 C175,85 125,85 100,50 C75,15 25,15 25,50 C25,85 75,85 100,50Z" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
  <circle r="13" fill="#ffd23f" stroke="#3b2a1a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#infp"/></animateMotion></circle></svg>
 <div id="lvup" hidden><div class="rays"></div><div class="lt"><b id="lvn">LEVEL 2!</b><small id="lvnew"></small></div></div>
@@ -148,9 +162,13 @@ const KEY='kadenHotel2';
 /* build order: the main corridor first, then the wings of the T. Each plot already knows what it will be. */
 const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'],['m',-1,2,'room'],['m',1,2,'snack'],['m',-1,3,'room'],['m',1,3,'room'],
  ['n',0,'room'],['n',-5,'room'],['n',5,'loo'],['s',-10.5,'room'],['s',10.5,'snack'],['n',-10,'room'],['n',10,'room'],['s',-15.5,'loo'],['s',15.5,'room'],['n',-15,'room'],['n',15,'snack'],
- ['n',-20,'room'],['n',20,'room'],['s',-20.5,'room'],['s',20.5,'snack'],['n',-25,'loo'],['n',25,'room'],['s',-25.5,'room'],['s',25.5,'room']];
-const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,10,10,11,11,12,12,13,13];
-const DEF={coins:0,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
+ ['n',-20,'room'],['n',20,'room'],['s',-20.5,'room'],['s',20.5,'snack'],['n',-25,'loo'],['n',25,'room'],['s',-25.5,'room'],['s',25.5,'room'],
+ // floor 2: one long hallway, rooms along the top, big family suites along the bottom
+ ['f2n',-2.5,'room'],['f2n',2.5,'room'],['f2s',7.25,'suite'],['f2n',-7.5,'room'],['f2n',7.5,'loo'],['f2s',-7.25,'suite'],
+ ['f2n',-12.5,'room'],['f2n',12.5,'snack'],['f2s',15.75,'suite'],['f2n',-17.5,'room'],['f2n',17.5,'room'],['f2s',-15.75,'suite']];
+const OX=150;// floor 2 is built off to the side and reached by the lift
+const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,10,10,11,11,12,12,13,13, 7,7,7,8,8,9,9,10,11,12,13,14];
+const DEF={floors:1,stats:{},goals:[],coins:0,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
 let G=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object.assign(G,s)}catch(e){}
 // older saves had one Shauna and one Jay
@@ -311,11 +329,14 @@ const WOOL=['#5aa9e6','#ff8ad8','#7bd35a','#ffd23f','#ff9f43','#4dd2d2','#b56bff
 const plots=ORDER.map((o,i)=>{let p;
  if(o[0]==='m'){const side=o[1],zc=-2.5-5*o[2];p={dx:side*2,dz:zc,ux:side,uz:0,vx:0,vz:1,cross:false,type:o[3]}}
  else if(o[0]==='n')p={dx:o[1],dz:-24,ux:0,uz:-1,vx:1,vz:0,cross:true,type:o[2]};
- else p={dx:o[1],dz:-20,ux:0,uz:1,vx:1,vz:0,cross:true,type:o[2]};
+ else if(o[0]==='s')p={dx:o[1],dz:-20,ux:0,uz:1,vx:1,vz:0,cross:true,type:o[2]};
+ else if(o[0]==='f2n')p={dx:OX+o[1],dz:0,ux:0,uz:-1,vx:1,vz:0,fl:1,type:o[2]};
+ else p={dx:OX+o[1],dz:4,ux:0,uz:1,vx:1,vz:0,fl:1,hw:4.25,type:o[2]};
+ p.fl=p.fl||0;p.hw=p.hw||2.5;const hw=p.hw;
  p.i=i;p.cp=LP(p,-2,0);p.din=LP(p,1,0);p.face=Math.atan2(-p.ux,-p.uz);
  const P=(du,dv)=>LP(p,du,dv);
- wallP(p,0,-2.5,0,-.85);wallP(p,0,.85,0,2.5);wallP(p,0,-2.5,6,-2.5);wallP(p,0,2.5,6,2.5);wallP(p,6,-2.5,6,2.5,OW,1.8);
- const c=P(3,0),ax=Math.abs(p.ux)>.5;p.floor=plane(ax?5.7:4.7,ax?4.7:5.7,tm('gravel',3,2.5),c.x,c.z,.02);
+ wallP(p,0,-hw,0,-.85);wallP(p,0,.85,0,hw);wallP(p,0,-hw,6,-hw);wallP(p,0,hw,6,hw);wallP(p,6,-hw,6,hw,OW,1.8);
+ const c=P(3,0),ax=Math.abs(p.ux)>.5,fw=2*hw-.3;p.floor=plane(ax?5.7:fw,ax?fw:5.7,tm('gravel',3,2.5),c.x,c.z,.02);
  p.tape=bx(p,.15,.3,1.7,'#ff4d4d',0,.8,0);const t1=P(-.2,-.85),t2=P(.2,.85);
  p.tapeCol={x1:Math.min(t1.x,t2.x),x2:Math.max(t1.x,t2.x),z1:Math.min(t1.z,t2.z),z2:Math.max(t1.z,t2.z),on:true};C.push(p.tapeCol);
  return p});
@@ -323,20 +344,32 @@ function LP(p,du,dv){return{x:p.dx+p.ux*du+p.vx*dv,z:p.dz+p.uz*du+p.vz*dv}}
 function bx(p,su,h,sv,c,du,y,dv,par){const w=LP(p,du,dv),ax=Math.abs(p.ux)>.5;return box(ax?su:sv,h,ax?sv:su,c,w.x,y,w.z,par)}
 function wallP(p,a1,b1,a2,b2,key,h){const A=LP(p,a1,b1),B=LP(p,a2,b2);return wall(Math.min(A.x,B.x),Math.min(A.z,B.z),Math.max(A.x,B.x),Math.max(A.z,B.z),key,h)}
 function local(p,pos){const dx=pos.x-p.dx,dz=pos.z-p.dz;return{u:dx*p.ux+dz*p.uz,v:dx*p.vx+dz*p.vz}}
-const inside=(p,pos)=>{const l=local(p,pos);return l.u>.25&&l.u<5.9&&Math.abs(l.v)<2.35};
-const LOBBY={cross:false,cp:{x:0,z:1}};
-const between=(a,b)=>(a.cross!==b.cross?[{x:0,z:-22}]:[]).concat([b.cp]);
+const inside=(p,pos)=>{const l=local(p,pos);return l.u>.25&&l.u<5.9&&Math.abs(l.v)<p.hw-.15};
+const LOBBY={cross:false,fl:0,cp:{x:0,z:1}};
+// lifts: walking onto the inside spot of one lift pops you out of the other
+const LIFT0={x:5.5,z:9.25},LIFT1={x:OX,z:9.25},LIFT0D={x:5.5,z:7.8},LIFT1D={x:OX,z:7.8},HALL2={x:OX,z:2};
+const floorOf=x=>x>OX-60?1:0;
+const between=(a,b)=>{const fa=a.fl||0,fb=b.fl||0;
+ if(fa===fb)return fa?[b.cp]:(a.cross!==b.cross?[{x:0,z:-22}]:[]).concat([b.cp]);
+ if(fa===0)return[...(a.cross?[{x:0,z:-22}]:[]),{x:0,z:1},LIFT0D,{...LIFT0,tele:LIFT1},LIFT1D,HALL2,b.cp];
+ return[HALL2,LIFT1D,{...LIFT1,tele:LIFT0},LIFT0D,{x:0,z:1},...(b.cross?[{x:0,z:-22}]:[]),b.cp]};
 
 const rooms=[],toilets=[],snacks=[],baths=[];
 const billGeo=new THREE.BoxGeometry(.56,.09,.3),billMat=tm('bill');
 function makePile(px,pz,n){const g=new THREE.Group();scene.add(g);const arr=[];
  for(let k=0;k<n;k++){const s=k%8,lv=k/8|0;const m=new THREE.Mesh(billGeo,billMat);m.castShadow=true;m.position.set(px+(s%2-.5)*.64,.05+lv*.1,pz+((s>>1)-1.5)*.36);g.add(m);arr.push(m)}
  const l=label('$0','#4cb050',1);l.position.set(px,2,pz);return{arr,l}}
-function buildRoom(p){const i=p.i;p.floor.material=tm('wool:'+WOOL[i%WOOL.length],3,2.5);const bed=new THREE.Group();scene.add(bed);
- const frame=bx(p,2.8,.45,1.8,tm('plank:#a0662f',2,.4),4.5,.22,0,bed);bx(p,2.7,.25,1.7,'#ffffff',4.5,.55,0,bed);
- const blanket=bx(p,1.7,.14,1.76,tm('wool:'+WOOL[(i+5)%WOOL.length],1.5,1.5),4,.72,0,bed);bx(p,.5,.2,1.1,'#fff7ea',5.3,.76,0,bed);
- const head=bx(p,.25,1.3,1.9,tm('plank:#7a4a22',.3,1),5.85,.65,0,bed);
- bx(p,.6,.6,.6,tm('plank:#c58b4a',.5,.5),5.4,.3,1.7,bed);bx(p,.24,.3,.24,'#ffd23f',5.4,.75,1.7,bed);
+// a family suite has a big double bed plus two single beds for the kids
+const SUITE_SPOTS=[-2.7,-1.6,1.3,3.0];
+function buildRoom(p){const i=p.i,suite=p.type==='suite';p.floor.material=tm('wool:'+WOOL[i%WOOL.length],3,2.5);const bed=new THREE.Group();scene.add(bed);
+ const bw=suite?2.6:1.8,bv=suite?-2.2:0,extra=[];
+ const frame=bx(p,2.8,.45,bw,tm('plank:#a0662f',2,.4),4.5,.22,bv,bed);bx(p,2.7,.25,bw-.1,'#ffffff',4.5,.55,bv,bed);
+ const blanket=bx(p,1.7,.14,bw-.04,tm('wool:'+WOOL[(i+5)%WOOL.length],1.5,1.5),4,.72,bv,bed);
+ (suite?[-.6,.6]:[0]).forEach(o=>bx(p,.5,.2,suite?.9:1.1,'#fff7ea',5.3,.76,bv+o,bed));
+ const head=bx(p,.25,1.3,bw+.1,tm('plank:#7a4a22',.3,1),5.85,.65,bv,bed);
+ if(suite)[1.3,3.0].forEach(v=>{bx(p,2.8,.45,1.2,tm('plank:#a0662f',2,.4),4.5,.22,v,bed);bx(p,2.7,.25,1.1,'#ffffff',4.5,.55,v,bed);
+  extra.push(bx(p,1.7,.14,1.16,tm('wool:'+WOOL[(i+8)%WOOL.length],1.5,1.5),4,.72,v,bed));bx(p,.5,.2,.8,'#fff7ea',5.3,.76,v,bed);bx(p,.25,1,1.3,tm('plank:#7a4a22',.3,1),5.85,.5,v,bed)});
+ bx(p,.6,.6,.6,tm('plank:#c58b4a',.5,.5),5.4,.3,suite?-.15:1.7,bed);bx(p,.24,.3,.24,'#ffd23f',5.4,.75,suite?-.15:1.7,bed);
  bx(p,.9,.05,.9,tm('wool:'+WOOL[(i+3)%WOOL.length]),1.6,.04,-1.2,bed);
  const tv=new THREE.Group();bed.add(tv);bx(p,.9,.6,.5,tm('plank:#7a4a22',.6,.5),2.3,.3,-2,tv);bx(p,1,.6,.1,'#222831',2.3,.95,-2.1,tv);const screen=bx(p,.85,.45,.02,'#4dd2d2',2.3,.95,-2.04,tv);
  const mess=new THREE.Group();scene.add(mess);
@@ -346,12 +379,12 @@ function buildRoom(p){const i=p.i;p.floor.material=tm('wool:'+WOOL[i%WOOL.length
  const t2=new THREE.Group(),t3=new THREE.Group();bed.add(t2);bed.add(t3);
  bx(p,.4,.4,.4,tm('plank:#a0662f',.4,.4),5.4,.2,-1.9,t2);bx(p,.6,.6,.6,tm('wool:#3f9f3a'),5.4,.7,-1.9,t2);bx(p,.2,.2,.2,'#ff4d4d',5.4,1.05,-1.9,t2);
  bx(p,1.3,.8,.06,'#ffd23f',4.4,1.15,-2.3,t2);bx(p,1.1,.6,.07,tm('wool:#5aa9e6'),4.4,1.15,-2.3,t2);
- bx(p,.8,.4,.8,tm('wool:#e2366b'),3.3,.2,1.85,t3);bx(p,.8,.6,.2,tm('wool:#e2366b'),3.3,.6,2.15,t3);bx(p,.15,1.2,.15,'#2b2140',2.4,.6,2.1,t3);bx(p,.4,.3,.4,'#fff3c4',2.4,1.3,2.1,t3);
- const pp=LP(p,1.3,1.75),pad=makePad(pp.x,pp.z,1.1);pad.lbl.scale.set(1.9,.95,1);pad.lbl.position.set(pp.x,1.6,pp.z);
+ const av=suite?-3.5:1.85,as=suite?-1:1;bx(p,.8,.4,.8,tm('wool:#e2366b'),suite?1.8:3.3,.2,av,t3);bx(p,.8,.6,.2,tm('wool:#e2366b'),suite?1.8:3.3,.6,av+.3*as,t3);bx(p,.15,1.2,.15,'#2b2140',suite?1:2.4,.6,av+.25*as,t3);bx(p,.4,.3,.4,'#fff3c4',suite?1:2.4,1.3,av+.25*as,t3);
+ const pp=LP(p,1.3,p.hw-.75),pad=makePad(pp.x,pp.z,1.1);pad.lbl.scale.set(1.9,.95,1);pad.lbl.position.set(pp.x,1.6,pp.z);
  const sg=new THREE.Group(),sp=LP(p,-.05,0);sg.position.set(sp.x,2.3,sp.z);sg.scale.setScalar(1.35);scene.add(sg);
  for(let k=0;k<4;k++){const m=new THREE.Mesh(star3G,star3M);sg.add(m)}
  const bicon=label('📺 🔧','#ff4d4d',1),bp=LP(p,2.2,-1.2);bicon.position.set(bp.x,2.6,bp.z);bicon.visible=false;
- const r={i,p,bed,tv,screen,bicon,blanket,mess,icon,frame,head,t2,t3,pad,sg,px:pp.x,pz:pp.z,occ:null,dirty:false,prog:0,claim:null,broken:false,fix:0,fixClaim:null};
+ const r={i,p,suite,extra,bed,tv,screen,bicon,blanket,mess,icon,frame,head,t2,t3,pad,sg,px:pp.x,pz:pp.z,occ:null,occN:0,dirty:false,prog:0,claim:null,broken:false,fix:0,fixClaim:null};
  rooms.push(r);rooms.sort((a,b)=>a.i-b.i);styleBeds();applyTier(r)}
 const TIERX=[0,1,1.5,2,2.6],TIERC=[0,0,60,150,300];
 const tierOf=r=>G.rt[r.i]||1;
@@ -377,8 +410,8 @@ function buildSnack(p){const i=p.i;p.floor.material=tm('wool:#ffe7a3',3,2.5);
  const s={i,p,px:pp.x,pz:pp.z,pv,t:0,bicon,broken:false,fix:0,fixClaim:null};snacks.push(s);drawSnack(s)}
 function drawSnack(s){const v=G.sp[s.i]||0,n=Math.min(16,Math.ceil(v/3));s.pv.arr.forEach((m,k)=>m.visible=k<n);s.pv.l.visible=v>0;setLabel(s.pv.l,'$'+v)}
 function buildPlot(i,quiet){const p=plots[i];G.built[i]=1;p.built=true;p.tape.visible=false;p.tapeCol.on=false;
- ({room:buildRoom,loo:buildLoo,snack:buildSnack})[p.type](p);if(!quiet)sfx.build()}
-function styleBeds(){rooms.forEach(r=>{r.blanket.material=tm('wool:'+(G.beds>=2?'#ff4dbb':G.beds?'#ffcf2e':WOOL[(r.i+5)%WOOL.length]),1.5,1.5);r.tv.visible=G.beds>=2})}
+ ({room:buildRoom,suite:buildRoom,loo:buildLoo,snack:buildSnack})[p.type](p);if(!quiet)sfx.build()}
+function styleBeds(){rooms.forEach(r=>{r.blanket.material=tm('wool:'+(G.beds>=2?'#ff4dbb':G.beds?'#ffcf2e':WOOL[(r.i+5)%WOOL.length]),1.5,1.5);r.extra.forEach(b=>b.material=tm('wool:'+(G.beds>=2?'#7fd6ff':G.beds?'#ffe680':WOOL[(r.i+8)%WOOL.length]),1.5,1.5));r.tv.visible=G.beds>=2})}
 function cleanRoom(r){{const c=LP(r.p,3,0);stars(c.x,1,c.z,12,3)}r.dirty=false;r.prog=0;r.claim=null;r.mess.visible=false;r.icon.visible=false;r.blanket.rotation.y=0;sfx.clean();const c=LP(r.p,3,0);fxAt(c.x,1.5,c.z,'✨ Sparkly!')}
 
 /* desk + cash pile */
@@ -437,6 +470,31 @@ box(.35,1.1,.35,'#e8eef2',FX,.8,FZ,fountain);box(.9,.18,.9,'#e8eef2',FX,1.4,FZ,f
 const fcol={x1:FX-1,x2:FX+1,z1:FZ-1,z2:FZ+1,on:false};C.push(fcol);
 function showFountain(){fountain.visible=!!G.fountain;fcol.on=!!G.fountain}
 function goldSeats(){toilets.forEach(t=>{if(t.seatM)t.seatM.material=mat(G.goldLoo?'#ffcf2e':'#dfe7ea')})}
+
+/* ---------- the lift and Floor 2 ---------- */
+function liftBox(x,z){const g=new THREE.Group();scene.add(g);
+ wall(x-1.4,z-.7,x-1.25,z+.75,'tile:#c9d1d8',2.2);wall(x+1.25,z-.7,x+1.4,z+.75,'tile:#c9d1d8',2.2);
+ box(2.8,.3,.25,'#9aa5b1',x,2.3,z-.7,g);plane(2.5,1.4,tm('tile:#b9c3cc',2,1),x,z,.03);box(.08,.5,.3,'#ffd23f',x+1.2,1.2,z-.45,g);
+ const dl=box(1.2,2,.1,'#d7dee5',x-.6,1,z-.7,g),dr=box(1.2,2,.1,'#d7dee5',x+.6,1,z-.7,g);box(.5,.2,.05,'#ffd23f',x,2.45,z-.78,g);
+ const l=label('🛗 Lift','#5d6b7a',.9);l.position.set(x,3.2,z-.7);return{g,dl,dr,x,z,open:0}}
+const lift0=liftBox(LIFT0.x,LIFT0.z),lift1=liftBox(LIFT1.x,LIFT1.z);
+// floor 2 sits on top of a tall brick tower, with the countryside far below
+box(42,14,17,tm('brick:#d97a4a',28,9),OX,-7.03,2).castShadow=false;
+plane(520,520,mat('#58a845'),OX,0,-14.5);
+for(let k=0;k<70;k++){const x=OX+(Math.random()-.5)*160,z=(Math.random()-.5)*160;if(Math.abs(x-OX)<24&&Math.abs(z-2)<12)continue;
+ if(k%3)box(1.6,2,1.6,'#3f9f3a',x,-13.5,z).castShadow=false;else box(2.4,1.4,2.4,pick(['#ff8a3d','#5aa9e6','#ffd23f','#ff6b6b']),x,-13.8,z).castShadow=false}
+plane(40,4,tm('wool:#3a5bd9',20,2),OX,2,.015);for(let x=-19;x<=19;x+=2)if(Math.abs(x)>3)plane(.2,3.2,tm('wool:#f2c14e'),OX+x,2,.02);
+plane(6,6,tm('checker',1.5,1.5),OX,7,.016);
+wall(OX-20.15,0,OX-19.85,4,OW,1.8);wall(OX+19.85,0,OX+20.15,4,OW,1.8);wall(OX-3,9.85,OX+3,10.15,OW,1.8);
+const f2L=label('⭐ Floor 2','#3a5bd9',1);f2L.position.set(OX,2.8,4);
+// small supply cupboard on the landing: paper on the left, spray on the right
+box(.6,1.8,2,tm('plank:#a0662f',1.5,1.5),OX-2.6,.9,7);C.push({x1:OX-2.95,x2:OX-2.3,z1:6,z2:8,on:true});
+for(let k=0;k<3;k++){const m=new THREE.Mesh(rollGeo,rollMat);m.position.set(OX-2.6,1.95,6.4+k*.6);scene.add(m)}
+box(.6,1.8,2,tm('plank:#a0662f',1.5,1.5),OX+2.6,.9,7);C.push({x1:OX+2.3,x2:OX+2.95,z1:6,z2:8,on:true});
+for(let k=0;k<3;k++){const m=new THREE.Mesh(sprayGeo,sprayMat);m.position.set(OX+2.6,1.95,6.4+k*.6);scene.add(m)}
+{const a=label('🧻',undefined,.7);a.position.set(OX-2.6,2.7,7);const b=label('🧴','#2ec4f1',.7);b.position.set(OX+2.6,2.7,7)}
+const PAPER2={x:OX-1.7,z:7},SPRAY2={x:OX+1.7,z:7};
+function openFloor2(){G.floors=2;plots.filter(p=>p.fl===1).slice(0,2).forEach(p=>{if(!G.built[p.i])buildPlot(p.i,true)})}
 G.built.forEach((b,i)=>{if(b)buildPlot(i,true)});
 
 /* ---------- blocky people ---------- */
@@ -464,7 +522,7 @@ function animate(g,moving,dt,hold,ride){const u=g.userData;u.ph=moving&&!ride?u.
  u.legL.rotation.x=s;u.legR.rotation.x=-s;if(hold){u.armL.rotation.x=u.armR.rotation.x=-1.25}else if(ride){u.armL.rotation.x=u.armR.rotation.x=-.9}else{u.armL.rotation.x=-s*.8;u.armR.rotation.x=s*.8}}
 function walk(e,dt,speed=3.4){const m=e.m;if(!e.path.length){animate(m,false,dt,e.hold);return false}
  const tg=e.path[0],dx=tg.x-m.position.x,dz=tg.z-m.position.z,d=Math.hypot(dx,dz),s=speed*dt;
- if(d<=s){m.position.x=tg.x;m.position.z=tg.z;e.path.shift()}else{m.position.x+=dx/d*s;m.position.z+=dz/d*s;m.rotation.y=Math.atan2(dx,dz)}
+ if(d<=s){m.position.x=tg.x;m.position.z=tg.z;e.path.shift();if(tg.tele){m.position.x=tg.tele.x;m.position.z=tg.tele.z}}else{m.position.x+=dx/d*s;m.position.z+=dz/d*s;m.rotation.y=Math.atan2(dx,dz)}
  animate(m,true,dt,e.hold);if(e.tag)e.tag.position.set(m.position.x,2.4,m.position.z);return!e.path.length}
 const player=person('#2ec4f1','#5a3a22','#e0a878','#3b5bab');player.position.set(DX,0,2.6);
 const backG=new THREE.Group();backG.position.set(0,.68,-.32);player.add(backG);
@@ -507,7 +565,7 @@ const STAFF=Object.entries(ROLE).flatMap(([role,R])=>R.list.map((d,k)=>({role,k,
  if(G.sfast)MAIDS.forEach((d,i)=>{const x=G.staff['m'+i];if(x)x.spd=Math.max(x.spd,1)});if(G.jfast)JANS.forEach((d,i)=>{const x=G.staff['j'+i];if(x)x.spd=Math.max(x.spd,1)});
  ['maids','jans','recep','sfast','jfast'].forEach(k=>delete G[k])}
 const MHOME=[{x:1.2,z:-.9},{x:-1.2,z:-.9},{x:1.2,z:-1.8},{x:-1.2,z:-1.8},{x:0,z:-1.3},{x:0,z:-2.3}];
-const JHOME=[{x:11,z:8.8},{x:9.6,z:8.8},{x:12.4,z:8.8},{x:8.2,z:8.8},{x:6.8,z:8.8}];
+const JHOME=[{x:11,z:8.8},{x:9.6,z:8.8},{x:12.4,z:8.8},{x:8.2,z:8.8},{x:13.2,z:7.4}];
 const WHOME=[{x:19,z:-1.3},{x:19,z:-2.6},{x:19,z:-3.9}],CHEFX=[12.2,14,15.8];
 const maids=[],jans=[],receps=[],chefs=[],waiters=[];
 const sk=o=>(G.staff[o.id]||{}).skl||0,spdOf=o=>3.6*(1+.25*((G.staff[o.id]||{}).spd||0));
@@ -550,11 +608,11 @@ const PADS=[
  ...tables.slice(2).map(t=>({id:'table'+t.i,x:t.x,z:t.z,size:1.3,cost:TCOST[t.i],icon:'🍽️',lv:TLV[t.i],name:'New restaurant table',show:()=>G.rest&&G.tables===t.i,buy:()=>{G.tables=t.i+1;showTables()}}))];
 PADS.forEach(p=>{Object.assign(p,makePad(p.x,p.z,p.size||1.8));p.lbl.position.set(p.x,1.8,p.z)});
 // the plot pad hops to the next plot to build; its type is already chosen and each build costs more
-const plotPad=makePad(0,0,1.5);
-const ICON={room:'🛏️',loo:'🚽',snack:'🥤'},NAME={room:'a new bedroom',loo:'new toilets',snack:'a snack bar'},TITLE={room:'New bedroom',loo:'New toilets',snack:'Snack bar'};
-const nextPlot=()=>plots.findIndex(p=>!G.built[p.i]);
-const builtCount=()=>G.built.filter(Boolean).length-2;
-const plotCost=i=>{const n=builtCount(),b=30+22*n+4*n*n,t=plots[i].type;return Math.round(b*(t==='snack'?1.2:t==='loo'?.8:1)/5)*5};
+const plotPad=makePad(0,0,1.5),plotPad2=makePad(OX,0,1.5),liftPad=makePad(LIFT0.x,LIFT0.z,1.2);liftPad.lbl.position.set(LIFT0.x,1.7,LIFT0.z);
+const ICON={room:'🛏️',loo:'🚽',snack:'🥤',suite:'👨‍👩‍👧'},NAME={room:'a new bedroom',loo:'new toilets',snack:'a snack bar',suite:'a family suite'},TITLE={room:'New bedroom',loo:'New toilets',snack:'Snack bar',suite:'Family suite (sleeps 3)'};
+const nextPlot=(fl=0)=>plots.findIndex(p=>p.fl===fl&&!G.built[p.i]);
+const builtCount=()=>G.built.filter(Boolean).length-2-(G.floors>1?2:0);
+const plotCost=i=>{const n=builtCount(),b=30+22*n+4*n*n,t=plots[i].type;return Math.round(b*(t==='snack'?1.2:t==='loo'?.8:t==='suite'?1.6:1)/5)*5};
 
 /* arrow pointing at the next job */
 const arrow=new THREE.Group();scene.add(arrow);
@@ -591,7 +649,7 @@ $('ans').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||!pu)return;
   if(type==='scooter')boost.speed=Math.min(90,boost.speed+40);
   if(type==='cash')boost.cash=Math.min(90,boost.cash+40);
   if(type==='magnet')boost.magnet=Math.min(90,boost.magnet+40);
-  if(type==='broom')rooms.filter(r=>r.dirty).forEach(cleanRoom);
+  if(type==='broom')rooms.filter(r=>r.dirty).forEach(cleanRoom);stat('power');
   removePU();setTimeout(()=>{resume();stars(player.position.x,1.2,player.position.z,24,4)},1100)}
  else{sfx.no();b.classList.add('wrong');b.disabled=true;$('mres').textContent='Not quite, try again! 💪'}};
 
@@ -628,9 +686,37 @@ $('mclose').onclick=()=>resume();
 $('mtabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(b){tab=b.dataset.tab;renderMenu()}};
 $('mlist').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
  if(b.dataset.hire){const st=STAFF.find(x=>x.id===b.dataset.hire);if(G.staff[st.id]||lockReason(st)||G.coins<st.d.cost)return;G.coins-=st.d.cost;G.staff[st.id]={spd:0,skl:0};addStaff(st);celebrate(st.d.n+' joined the team!')}
- if(b.dataset.up){const[id,key]=b.dataset.up.split(':'),st=STAFF.find(x=>x.id===id),o=G.staff[id],c=upCost(st,o[key]||0);if((o[key]||0)>=3||G.coins<c)return;G.coins-=c;o[key]=(o[key]||0)+1;celebrate(st.d.n+' got better!')}
+ if(b.dataset.up){const[id,key]=b.dataset.up.split(':'),st=STAFF.find(x=>x.id===id),o=G.staff[id],c=upCost(st,o[key]||0);if((o[key]||0)>=3||G.coins<c)return;G.coins-=c;o[key]=(o[key]||0)+1;stat('upgrade');celebrate(st.d.n+' got better!')}
  if(b.dataset.perk){const p=PERKS.find(x=>x.id===b.dataset.perk),s=perkState(p);if(s.max||s.lock||G.coins<s.cost)return;G.coins-=s.cost;p.buy();celebrate(s.name+'!')}
  save();renderMenu()};
+
+/* ---------- goals: three little jobs at a time, each with a cash reward ---------- */
+function stat(k,n=1){G.stats[k]=(G.stats[k]||0)+n}
+const GOALT=[
+ {type:'checkin',icon:'🛎️',text:n=>`Check in ${n} guests`,n:[3,6,10]},
+ {type:'clean',icon:'🧹',text:n=>`Clean ${n} rooms yourself`,n:[2,3,5]},
+ {type:'paper',icon:'🧻',text:n=>`Put ${n} toilet rolls in the toilets`,n:[4,6,10]},
+ {type:'cash',icon:'💵',text:n=>`Collect $${n}`,n:[60,200,500]},
+ {type:'build',icon:'🔨',text:n=>n>1?`Build ${n} new things`:'Build something new',n:[1,1,2]},
+ {type:'power',icon:'🛴',text:()=>'Find a power-up',n:[1,1,1]},
+ {type:'vip',icon:'👑',text:()=>'Check in a VIP guest',n:[1,1,2],need:()=>level()>=2},
+ {type:'upgrade',icon:'⭐',text:n=>n>1?`Upgrade ${n} times`:'Upgrade a room or a worker',n:[1,1,2],need:()=>level()>=3},
+ {type:'fix',icon:'🔧',text:n=>`Fix ${n} broken thing${n>1?'s':''}`,n:[1,2,3],need:()=>level()>=3},
+ {type:'serve',icon:'🍔',text:n=>`Serve ${n} burgers`,n:[2,4,6],need:()=>G.rest},
+ {type:'spray',icon:'🧴',text:n=>`Grab ${n} cleaning sprays`,n:[3,5,8]}];
+function newGoal(){const pool=GOALT.filter(t=>(!t.need||t.need())&&!G.goals.some(g=>g.type===t.type)),t=pick(pool),tier=Math.min(2,Math.floor((level()-1)/4));
+ return{type:t.type,need:t.n[tier],start:G.stats[t.type]||0,reward:Math.round((20+9*level())*(1+tier*.4)/5)*5}}
+function fillGoals(){while(G.goals.length<3)G.goals.push(newGoal())}
+const gProg=g=>Math.min(g.need,(G.stats[g.type]||0)-g.start);
+let goalsHTML='';
+function renderGoals(){const h=G.goals.map((g,i)=>{const t=GOALT.find(x=>x.type===g.type),p=gProg(g),done=p>=g.need;
+ return`<div class="goal${done?' done':''}" data-g="${i}">${t.icon} ${t.text(g.need)} <small>${p}/${g.need}</small><div class="gb"><i style="width:${p/g.need*100}%"></i></div>${done?`<b>Tap to collect $${g.reward}!</b>`:''}</div>`}).join('');
+ if(h!==goalsHTML){goalsHTML=h;$('glist').innerHTML=h}
+ const n=G.goals.filter(g=>gProg(g)>=g.need).length;put('gh',n?`🎯 Goals · ${n} ready!`:'🎯 Goals')}
+$('glist').onclick=e=>{const el=e.target.closest('[data-g]');if(!el)return;const i=+el.dataset.g,g=G.goals[i];if(!g||gProg(g)<g.need)return;
+ G.coins+=g.reward;bump=1;stars(player.position.x,1.5,player.position.z,30,4.5);celebrate(`Goal done! +$${g.reward}`);G.goals.splice(i,1);G.goals.push(newGoal());save();renderGoals()};
+$('gh').onclick=()=>{G.gmin=!G.gmin;$('goals').classList.toggle('min',G.gmin);save()};
+fillGoals();if(G.gmin||innerWidth<600)$('goals').classList.add('min');
 
 /* ---------- guests ---------- */
 const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd23f','#ff4d4d','#8d6e63'];
@@ -643,13 +729,19 @@ function spawn(){const vip=G.served>=5&&Math.random()<.15;
 function say(g,t,sec=2){setLabel(g.icon,t);g.icon.visible=true;g.iconT=sec}
 const freeRoom=()=>rooms.find(r=>!r.occ&&!r.dirty&&!r.broken);
 const cashX=()=>boost.cash>0?2:1;
-function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;g.room=r;g.state='toRoom';g.arrived=false;
+function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;r.occN=1;g.room=r;g.spot=0;g.state='toRoom';g.arrived=false;
  g.path=[{x:-1.2,z:DZ+1.7},{x:0,z:1},...between(LOBBY,r.p),r.p.din,LP(r.p,3,0)];
- const pay=(Math.round([10,15,22][G.beds]*TIERX[tierOf(r)])+(G.fountain?3:0))*(g.vip?3:1)*cashX();
+ // a family suite: the rest of the family follows the guest who checked in
+ if(r.suite){const n=1+(Math.random()<.5?1:0);for(let k=1;k<=n;k++){const kid=k===n||Math.random()<.5;
+  const f={m:person(pick(SHIRTS),pick(HAIR),g.m.userData.skin||pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b'])),room:r,spot:k,state:'toRoom',t:0,path:[{x:DX+(k*.7),z:DZ+2.6},...g.path]};
+  if(kid)f.m.scale.setScalar(.72);f.m.position.set(DX+k*.8,0,DZ+3.2);f.icon=label('',undefined,.9);f.icon.visible=false;guests.push(f);r.occN++}}
+ const pay=(Math.round([10,15,22][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?3:0))*(g.vip?3:1)*cashX();
  fly(billGeo,billMat,g.m.position.clone().setY(1.2),()=>W3(PX,.6,PZ),.5,()=>{G.pile+=pay;drawPile();sfx.cash()});
- sfx.ding();stars(DX,1.6,DZ,g.vip?14:5,2.5);fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
+ stat('checkin');if(g.vip)stat('vip');sfx.ding();stars(DX,1.6,DZ,g.vip?14:5,2.5);fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
  Q.forEach((q,i)=>{q.path=[slot(i)];q.arrived=false});save()}
-function leaveRoom(g){const r=g.room,p=r.p;r.occ=null;r.dirty=true;r.prog=0;r.mess.visible=true;r.icon.visible=true;r.blanket.rotation.y=.35;
+function leaveRoom(g){const r=g.room,p=r.p;
+ if(r.suite&&--r.occN>0){const s=LP(p,2.6,0);g.m.rotation.set(0,0,0);g.m.position.set(s.x,0,s.z);g.icon.visible=false;afterVisit(g,[p.din,p.cp],p);return}
+ r.occ=null;r.occN=0;r.dirty=true;r.prog=0;r.mess.visible=true;r.icon.visible=true;r.blanket.rotation.y=.35;
  if(G.beds>=2&&level()>=3&&Math.random()<.05)breakIt(r);
  const s=LP(p,2.6,0);g.m.rotation.set(0,0,0);g.m.position.set(s.x,0,s.z);g.icon.visible=false;const before=level();G.served++;if(level()>before)levelUp();
  const out=[p.din,p.cp],t=tables.find(t=>tableOpen(t)&&t.state==='free');
@@ -662,7 +754,7 @@ function afterVisit(g,out,from){const free=toilets.filter(t=>t.open()&&!t.occ&&!
  else{g.state='exit';g.path=[...out,...between(from,LOBBY),{x:1.4,z:8.6},{x:0,z:13}]}}
 function arrive(g){
  if(g.state==='queue'){g.arrived=true;g.m.rotation.y=Math.PI}
- else if(g.state==='toRoom'){const p=g.room.p,s=LP(p,3.3,0);g.state='sleep';g.t=9;g.m.rotation.order='YXZ';g.m.rotation.set(-Math.PI/2,Math.atan2(-p.ux,-p.uz),0);g.m.position.set(s.x,.72,s.z);
+ else if(g.state==='toRoom'){const p=g.room.p,s=LP(p,3.3,g.room.suite?SUITE_SPOTS[g.spot||0]:0);g.state='sleep';g.t=9;g.m.rotation.order='YXZ';g.m.rotation.set(-Math.PI/2,Math.atan2(-p.ux,-p.uz),0);g.m.position.set(s.x,.72,s.z);
   setLabel(g.icon,'💤');g.icon.visible=true;g.iconT=99}
  else if(g.state==='toToilet'){g.state='loo';g.t=2.2;g.m.rotation.y=g.toilet.face}
  else if(g.state==='toEat'){g.state='hungry';g.sit=true;g.m.rotation.y=Math.PI/2;g.table.state='wait';setLabel(g.icon,'🍔 ?');g.icon.visible=true;g.iconT=999}
@@ -703,7 +795,9 @@ addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;let d
 function endJoy(e){if(e.pointerId!==joy.id)return;joy.on=false;joy.dx=joy.dy=0;$('inf').classList.remove('off')}
 addEventListener('pointerup',endJoy);addEventListener('pointercancel',endJoy);
 addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
-function collide(p){for(const c of C){if(!c.on)continue;const nx=Math.max(c.x1,Math.min(p.x,c.x2)),nz=Math.max(c.z1,Math.min(p.z,c.z2));
+function collide(p){if(p.x>OX-60){for(const c of C){if(!c.on||c.x2<OX-60)continue;const nx=Math.max(c.x1,Math.min(p.x,c.x2)),nz=Math.max(c.z1,Math.min(p.z,c.z2));
+  const dx=p.x-nx,dz=p.z-nz,d=Math.hypot(dx,dz),r=.36;if(d<r){if(d>0){p.x=nx+dx/d*r;p.z=nz+dz/d*r}else{p.z=c.z2+r}}}
+ p.x=Math.max(OX-19.6,Math.min(OX+19.6,p.x));p.z=Math.max(-5.6,Math.min(9.6,p.z));return}for(const c of C){if(!c.on)continue;const nx=Math.max(c.x1,Math.min(p.x,c.x2)),nz=Math.max(c.z1,Math.min(p.z,c.z2));
  const dx=p.x-nx,dz=p.z-nz,d=Math.hypot(dx,dz),r=.36;if(d<r){if(d>0){p.x=nx+dx/d*r;p.z=nz+dz/d*r}else{p.z=c.z2+r}}}
  p.x=Math.max(-27.6,Math.min(27.6,p.x));p.z=Math.max(-29.6,Math.min(9.5,p.z))}
 
@@ -763,15 +857,16 @@ function stepWaiter(w,dt){const cap=1+sk(w);w.hold=w.carry>0;w.tray.forEach((m,k
 function stepChef(c,dt,now){const u=c.m.userData,busy=food<8;u.armL.rotation.x=busy?-1+Math.sin(now/120+c.k)*.35:0;u.armR.rotation.x=busy?-1-Math.sin(now/120+c.k)*.35:0}
 
 /* ---------- main loop ---------- */
+let liftLock=false,liftT=0,camSnap=false;
 let last=performance.now(),saveT=0,running=false,started=false,hintTxt='',pileT=0,rollT=0,warnT=0,dotT=0,menuDot=false;
-const HC={};function put(id,v,prop='textContent'){if(HC[id+prop]===v)return false;HC[id+prop]=v;if(prop==='width')$(id).style.width=v;else $(id)[prop]=v;return true}
+const HC={};function put(id,v,prop='textContent'){if(HC[id+prop]===v)return false;HC[id+prop]=v;if(prop==='width'||prop==='top')$(id).style[prop]=v;else $(id)[prop]=v;return true}
 let shownCash=0,bumpT=0;
 function hud(dt=1){const before=Math.round(shownCash);shownCash+=(G.coins-shownCash)*Math.min(1,dt*9);if(Math.abs(G.coins-shownCash)<.5)shownCash=G.coins;
  const sc=Math.round(shownCash);put('cash','$'+sc);bumpT-=dt;if(sc>before&&bumpT<=0){bumpT=.25;const c=$('cash');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
  put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('snd',G.mute?'🔇':'🔊');
  const L=level(),a=LEVELS[L-1],b=LEVELS[L];put('lvt','Level '+L);put('lvlbar',(b?(G.served-a)/(b-a)*100:100)+'%','width');
  put('boosts',(boost.speed>0?`<span class="pill">🛴 ${Math.ceil(boost.speed)}s</span>`:'')+(boost.cash>0?`<span class="pill">💵×2 ${Math.ceil(boost.cash)}s</span>`:'')+(boost.magnet>0?`<span class="pill">🧲 ${Math.ceil(boost.magnet)}s</span>`:''),'innerHTML')}
-function setHint(t,x,z){if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
+function setHint(t,x,z){if(x!==undefined&&floorOf(x)!==floorOf(player.position.x)){const L=floorOf(player.position.x)?LIFT1:LIFT0;x=L.x;z=L.z;t+=' (take the 🛗 lift)'}if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
 // standing on a square only offers it: nothing is spent until Buy is tapped
 let offerNext=null,offerCur=null;
 const leftOf=(id,cost)=>Math.max(0,cost-(G.paid[id]||0));
@@ -781,7 +876,7 @@ function showOffer(){const n=offerNext;offerNext=null;
  offerCur=n;if(!n)return;const left=leftOf(n.id,n.cost);
  put('bsub',n.lock?'🔒 '+n.lock:G.coins>=left?'Tap to buy!':`Need $${left-G.coins} more`);put('bbtn',n.lock?'🔒':'$'+left);put('bbtn',!!n.lock||G.coins<left,'disabled')}
 $('bbtn').onclick=()=>{const o=offerCur;if(!o||o.lock)return;const left=leftOf(o.id,o.cost);if(G.coins<left){sfx.no();return}
- G.coins-=left;delete G.paid[o.id];for(let k=0;k<8;k++)setTimeout(()=>fly(billGeo,billMat,backTop(),()=>W3(o.x,.1,o.z),.32,()=>tone(700+Math.random()*400,.04,'triangle',0,.05)),k*45);
+ G.coins-=left;delete G.paid[o.id];stat(o.id.startsWith('rt')?'upgrade':'build');for(let k=0;k<8;k++)setTimeout(()=>fly(billGeo,billMat,backTop(),()=>W3(o.x,.1,o.z),.32,()=>tone(700+Math.random()*400,.04,'triangle',0,.05)),k*45);
  o.done();sfx.build();stars(o.x,.5,o.z,26,4.5);fxAt(o.x,1.5,o.z,'Built! 🎉');save();offerCur=null;$('buy').hidden=true;HC['bbtndisabled']=null};
 function step(dt){
  const now=performance.now();for(const k in boost)boost[k]=Math.max(0,boost[k]-dt);
@@ -804,7 +899,7 @@ function step(dt){
 
  pileT+=dt;
  const grab=(get,set,px,pz,draw)=>{if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
-  fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;bump=1;sfx.cash()})}};
+  fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}};
  grab(()=>G.pile,v=>G.pile=v,PX,PZ,drawPile);
  tables.forEach(t=>{if(tableOpen(t))grab(()=>G.tp[t.i]||0,v=>G.tp[t.i]=v,t.x,t.z,()=>drawTable(t))});
  snacks.forEach(s=>{s.t+=dt;if(s.t>4){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=(2+G.snackUp)*cashX();drawSnack(s)}}
@@ -814,20 +909,23 @@ function step(dt){
  // closet: the paper shelf (front half) gives toilet rolls, the spray shelf (back half) gives spray
  if(inCloset()&&rollT>.18){
   if(P.z<5.5&&carrying+rollsFlying<CAP()){rollT=0;rollsFlying++;sfx.pop();fly(rollGeo,rollMat,W3(-12.6,2,3.5),handTop,.35,()=>{rollsFlying--;carrying++})}
-  else if(P.z>=5.5&&sprays+spraysFlying<SCAP()){rollT=0;spraysFlying++;sfx.pop();fly(sprayGeo,sprayMat,W3(-12.6,2,7.4),beltPos,.35,()=>{spraysFlying--;sprays++})}}
+  else if(P.z>=5.5&&sprays+spraysFlying<SCAP()){rollT=0;spraysFlying++;stat('spray');sfx.pop();fly(sprayGeo,sprayMat,W3(-12.6,2,7.4),beltPos,.35,()=>{spraysFlying--;sprays++})}}
  toilets.forEach(t=>{const open=t.open();t.rolls.forEach((m,k)=>m.visible=k<t.paper);t.icon.visible=open;
   if(!t.puddle){t.puddle=plane(.9,.8,mat('#6ec6ff'),t.seat.x,t.seat.z,.035)}t.puddle.visible=t.broken;
   if(!open)return;setLabel(t.icon,t.broken?'🔧 Blocked':'🧻 '+t.paper,t.broken||!t.paper?'#ff4d4d':'#fffaf0');t.icon.position.y=2.9+(t.paper&&!t.broken?0:Math.sin(now/150)*.15);
 });
+ // upstairs cupboard on the Floor 2 landing
+ if(near(PAPER2.x,PAPER2.z,1.2)&&rollT>.18&&carrying+rollsFlying<CAP()){rollT=0;rollsFlying++;sfx.pop();fly(rollGeo,rollMat,W3(OX-2.6,2,7),handTop,.35,()=>{rollsFlying--;carrying++})}
+ if(near(SPRAY2.x,SPRAY2.z,1.2)&&rollT>.18&&sprays+spraysFlying<SCAP()){rollT=0;spraysFlying++;sfx.pop();fly(sprayGeo,sprayMat,W3(OX+2.6,2,7),beltPos,.35,()=>{spraysFlying--;sprays++})}
  // walk into any bathroom and the toilet paper hops to the toilets that need it
  if(carrying&&rollT>.2){const b=baths.find(b=>b.inside(P)),t=b&&needs(b).sort((a,c)=>a.paper+a.incoming-c.paper-c.incoming)[0];
   if(t){rollT=0;carrying--;t.incoming++;sfx.pop();
-   fly(rollGeo,rollMat,handTop(),()=>W3(t.holder.x,.6,t.holder.z),.45,()=>{t.incoming--;t.paper++;if(t.paper===4){stars(t.holder.x,1,t.holder.z,8,2.5);fxAt(t.holder.x,2,t.holder.z,'Full! ✨')}})}}
+   fly(rollGeo,rollMat,handTop(),()=>W3(t.holder.x,.6,t.holder.z),.45,()=>{t.incoming--;t.paper++;stat('paper');if(t.paper===4){stars(t.holder.x,1,t.holder.z,8,2.5);fxAt(t.holder.x,2,t.holder.z,'Full! ✨')}})}}
 
  warnT-=dt;
  rooms.forEach(r=>{if(!r.dirty)return;r.icon.position.y=3+Math.sin(now/200+r.i)*.2;
   if(!inside(r.p,P))return;
-  if(sprays>0){r.prog+=dt/1.6;ringP=r.prog;if(r.prog>=1){sprays--;cleanRoom(r)}}
+  if(sprays>0){r.prog+=dt/1.6;ringP=r.prog;if(r.prog>=1){sprays--;stat('clean');cleanRoom(r)}}
   else if(warnT<=0){warnT=2.5;fxAt(P.x,2.4,P.z,'Need spray! 🧴');sfx.no()}});
 
  // room upgrade squares (from hotel level 3)
@@ -841,14 +939,24 @@ function step(dt){
   pulse(p,!lk&&G.coins>=leftOf(p.id,p.cost));
   setLabel(p.lbl,lk?`${p.icon} 🔒 Level ${p.lv}`:`${p.icon}  $${leftOf(p.id,p.cost)}`,lk?'#dddddd':undefined);
   consider(p,p.x,p.z,{id:p.id,cost:p.cost,icon:p.icon,name:p.name,lock:lk?'Reach level '+p.lv:'',done:p.buy})});
- const ni=nextPlot(),pl=ni>=0?plots[ni]:null;let plotLocked=false;
- plotPad.mesh.visible=plotPad.lbl.visible=!!pl;
- if(pl){const pp=LP(pl,-1,0);plotPad.mesh.position.set(pp.x,0,pp.z);plotPad.lbl.position.set(pp.x,1.8,pp.z);
-  plotLocked=level()<PLV[ni];const id='plot'+ni,cost=plotCost(ni);
-  setLabel(plotPad.lbl,plotLocked?`🔒 Level ${PLV[ni]}`:`${ICON[pl.type]}  $${leftOf(id,cost)}`,plotLocked?'#dddddd':undefined);
-  plotPad.mesh.children[1].material=plotLocked?mat('#9a9a9a'):tm('wool:#4cb050');
-  pulse(plotPad,!plotLocked&&G.coins>=leftOf(id,cost));
-  consider(plotPad,pp.x,pp.z,{id,cost,icon:ICON[pl.type],name:TITLE[pl.type],lock:plotLocked?'Reach level '+PLV[ni]:'',done:()=>buildPlot(ni)})}
+ // the next spot to build on each floor
+ const plotFor=(pad,fl)=>{const ni=nextPlot(fl),pl=ni>=0&&(fl===0||G.floors>=2)?plots[ni]:null;pad.mesh.visible=pad.lbl.visible=!!pl;if(!pl)return null;
+  const pp=LP(pl,-1,0);pad.mesh.position.set(pp.x,0,pp.z);pad.lbl.position.set(pp.x,1.8,pp.z);
+  const lk=level()<PLV[ni],id='plot'+ni,cost=plotCost(ni);
+  setLabel(pad.lbl,lk?`🔒 Level ${PLV[ni]}`:`${ICON[pl.type]}  $${leftOf(id,cost)}`,lk?'#dddddd':undefined);
+  pad.mesh.children[1].material=lk?mat('#9a9a9a'):tm('wool:#4cb050');pulse(pad,!lk&&G.coins>=leftOf(id,cost));
+  consider(pad,pp.x,pp.z,{id,cost,icon:ICON[pl.type],name:TITLE[pl.type],lock:lk?'Reach level '+PLV[ni]:'',done:()=>buildPlot(ni)});
+  return{ni,pl,pp,lk,ready:!lk&&G.coins>=leftOf(id,cost)}};
+ const PP0=plotFor(plotPad,0),PP1=plotFor(plotPad2,1),PPn=floorOf(P.x)?PP1||PP0:PP0||PP1;
+ // the lift: buy Floor 2 by standing in it, then ride it up and down
+ liftPad.mesh.visible=liftPad.lbl.visible=G.floors<2;
+ if(G.floors<2){const lk=level()<7;setLabel(liftPad.lbl,lk?'🛗 🔒 Level 7':'🛗 Floor 2  $500',lk?'#dddddd':undefined);liftPad.mesh.children[1].material=lk?mat('#9a9a9a'):tm('wool:#4cb050');pulse(liftPad,!lk&&G.coins>=leftOf('floor2',500));
+  consider(liftPad,LIFT0.x,LIFT0.z,{id:'floor2',cost:500,icon:'🛗',name:'Open Floor 2 (with 2 free rooms)',lock:lk?'Reach level 7':'',done:openFloor2})}
+ else{const L=near(LIFT0.x,LIFT0.z,.75)?LIFT0:near(LIFT1.x,LIFT1.z,.75)?LIFT1:null;
+  if(L&&!liftLock){liftT+=dt;ringP=liftT/.7;if(liftT>=.7){const T2=L===LIFT0?LIFT1:LIFT0;P.x=T2.x;P.z=T2.z-.1;camSnap=true;liftLock=true;liftT=0;sfx.ding();
+   const f=$('fade');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');setTimeout(()=>fxAt(P.x,2.5,P.z,T2===LIFT1?'⭐ Floor 2':'🏨 Ground floor'),250)}}
+  if(!L){liftLock=false;liftT=0}}
+ [lift0,lift1].forEach(l=>{const o=near(l.x,l.z,2.6)?1:0;l.open+=(o-l.open)*Math.min(1,dt*6);l.dl.position.x=l.x-.6-l.open*.55;l.dr.position.x=l.x+.6+l.open*.55});
  showOffer();
 
  // restaurant: chefs cook, Kaden or the waiters carry burgers to hungry diners
@@ -857,10 +965,10 @@ function step(dt){
  if(G.rest&&near(KITCHEN.x,KITCHEN.z,1.7)&&food>0&&carryFood+foodFly<FCAP()&&rollT>.2){rollT=0;food--;foodFly++;sfx.pop();
   fly(burgerGeo,burgerMat,W3(14,1.3,-12.3),trayTop,.32,()=>{foodFly--;carryFood++})}
  if(carryFood&&rollT>.25){const t=tables.find(t=>t.state==='wait'&&near(t.x,t.z,1.9));
-  if(t){rollT=0;carryFood--;t.state='served';if(t.claim)t.claim=null;fly(burgerGeo,burgerMat,trayTop(),()=>W3(t.x-.2,1.06,t.z),.3,()=>serveTable(t))}}
+  if(t){rollT=0;carryFood--;stat('serve');t.state='served';if(t.claim)t.claim=null;fly(burgerGeo,burgerMat,trayTop(),()=>W3(t.x-.2,1.06,t.z),.3,()=>serveTable(t))}}
  trayG.position.y=.9+(carrying?((carrying+1)>>1)*.3:0);TRAY.forEach((m,k)=>m.visible=k<carryFood);
  // fixing things yourself: stand on the spot by the 🔧
- const iss=issues();iss.forEach(i=>{if(near(i.spot.x,i.spot.z,1.1)){i.o.fix+=dt/2;ringP=i.o.fix;if(i.o.fix>=1)fixDone(i.o,i.spot)}});
+ const iss=issues();iss.forEach(i=>{if(near(i.spot.x,i.spot.z,1.1)){i.o.fix+=dt/2;ringP=i.o.fix;if(i.o.fix>=1){stat('fix');fixDone(i.o,i.spot)}}});
 
  if(pu){pu.life-=dt;pu.inner.rotation.y+=dt*2;pu.inner.position.y=.2+Math.sin(now/250)*.15;pu.glow.scale.setScalar(1+Math.sin(now/200)*.12);
   pu.g.visible=pu.l.visible=pu.life>5||Math.sin(now/90)>0;
@@ -883,7 +991,8 @@ function step(dt){
 
  const dirty=rooms.find(r=>r.dirty&&!r.claim),empty=toilets.find(t=>t.open()&&t.paper===0&&!t.bath.claim),low=toilets.find(t=>t.open()&&t.paper<4);
  const pad=PADS.find(p=>p.show()&&level()>=p.lv&&G.coins>=leftOf(p.id,p.cost));
- const plotReady=pl&&!plotLocked&&G.coins>=leftOf('plot'+ni,plotCost(ni));
+ const plotReady=PPn&&PPn.ready,pl=plotReady&&PPn.pl;
+ const ps=floorOf(P.x)?PAPER2:PAPERSPOT,ss=floorOf(P.x)?SPRAY2:SPRAYSPOT;
  const fixers=jans.filter(j=>j.d.fixer),openIssue=iss.find(i=>!i.o.fixClaim);
  const hungry=tables.find(t=>t.state==='wait'&&!t.claim),tcash=tables.find(t=>(G.tp[t.i]||0)>=10);
  const dc=dirty&&LP(dirty.p,3,0);
@@ -892,28 +1001,31 @@ function step(dt){
  else if(openIssue&&!fixers.length)setHint(`${openIssue.what}! Stand by the 🔧 to fix it`,openIssue.spot.x,openIssue.spot.z);
  else if(hungry&&carryFood)setHint('Take the burger to the hungry diner 🍔',hungry.x,hungry.z);
  else if(hungry&&!waiters.length&&food>0)setHint('A diner is hungry! Grab a burger from the kitchen 🍳',KITCHEN.x,KITCHEN.z);
- else if(dirty&&!sprays&&!inCloset())setHint('Out of spray! Get some from the closet 🧴',SPRAYSPOT.x,SPRAYSPOT.z);
+ else if(dirty&&!sprays&&!inCloset())setHint('Out of spray! Get some from the closet 🧴',ss.x,ss.z);
  else if(front&&front.arrived&&!fr&&dirty)setHint('No clean rooms! Walk into a messy room to clean it 🧹',dc.x,dc.z);
- else if(empty&&!carrying&&!inCloset())setHint('A toilet is out of paper! Get some from the closet 🧻',PAPERSPOT.x,PAPERSPOT.z);
+ else if(empty&&!carrying&&!inCloset())setHint('A toilet is out of paper! Get some from the closet 🧻',ps.x,ps.z);
  else if(carrying&&low&&!low.bath.inside(P))setHint('Walk into the toilets with the paper 🚽',low.bath.zone.x,low.bath.zone.z);
  else if(dirty)setHint('A room is messy! Walk inside to clean it 🧹',dc.x,dc.z);
  else if(G.pile>=10)setHint('Grab the cash by the desk 💵',PX,PZ);
  else if(tcash)setHint('Collect the cash from the restaurant tables 💵',tcash.x,tcash.z);
  else if(plotReady){const pp=LP(pl,-1,0);setHint(`You can build ${NAME[pl.type]}! Stand on the green square and tap Buy`,pp.x,pp.z)}
  else if(pad)setHint(`You can buy: ${pad.name}! Stand on the green square and tap Buy`,pad.x,pad.z);
+ else if(G.floors<2&&level()>=7&&G.coins>=500)setHint('You can open Floor 2! Stand in the 🛗 lift and tap Buy',LIFT0.x,LIFT0.z);
  else if(menuDot)setHint('Open 🏨 Manager to hire staff and buy upgrades!');
  else if(level()>=3&&rooms.some(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1])){const r=rooms.find(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1]);setHint('Make a room fancier so guests pay more! ⬆️',r.px,r.pz)}
  else if(snacks.some(s=>G.sp[s.i]>=20)){const s=snacks.find(s=>G.sp[s.i]>=20);setHint('The snack bar made cash! 🥤',s.px,s.pz)}
- else if(low&&!carrying&&low.paper<2&&!jans.length)setHint('Toilet paper is running low 🧻',PAPERSPOT.x,PAPERSPOT.z);
+ else if(low&&!carrying&&low.paper<2&&!jans.length)setHint('Toilet paper is running low 🧻',ps.x,ps.z);
  else setHint(atDesk?'Wait here for guests 🛎️':'Go stand behind the desk for the next guest 🛎️',atDesk?undefined:DX,DZ-1.5);
 
  const asp=innerWidth/innerHeight,want=asp<1?14:19,D=Math.max(16,Math.min(32,want/2/(Math.tan(21*Math.PI/180)*asp)));
- const oy=D*.84,oz=D*.54,cz=Math.max(-26,Math.min(6,P.z)),cx=Math.max(-24,Math.min(24,P.x));
- cam.position.x+=(cx-cam.position.x)*Math.min(1,dt*4);cam.position.y=oy;cam.position.z+=(cz+oz-cam.position.z)*Math.min(1,dt*4);
+ const up=floorOf(P.x),oy=D*.84,oz=D*.54,cz=up?Math.max(-3,Math.min(6,P.z)):Math.max(-26,Math.min(6,P.z)),cx=up?Math.max(OX-12,Math.min(OX+12,P.x)):Math.max(-24,Math.min(24,P.x));
+ const camK=camSnap?1:Math.min(1,dt*4);camSnap=false;
+ cam.position.x+=(cx-cam.position.x)*camK;cam.position.y=oy;cam.position.z+=(cz+oz-cam.position.z)*camK;
  cam.lookAt(cam.position.x,0,cam.position.z-oz);
  sun.position.set(cam.position.x-10,30,cam.position.z+2);sun.target.position.set(cam.position.x,0,cam.position.z-oz);
  if(G.fountain){fw.scale.setScalar(1+Math.sin(now/300)*.03);fw2.position.y=1.5+Math.sin(now/200)*.03;if(Math.random()<dt*1.5)stars(FX,1.7,FZ,1,1.6)}
- dotT-=dt;if(dotT<=0){dotT=.5;menuDot=anyBuyable();put('dot',!menuDot,'hidden')}
+ dotT-=dt;if(dotT<=0){dotT=.4;menuDot=anyBuyable();put('dot',!menuDot,'hidden');renderGoals();
+  const hb=document.querySelector('.hud').getBoundingClientRect().bottom;put('goals',Math.round(hb+8)+'px','top')}
  // far-away labels fade out so the screen stays tidy
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  saveT+=dt;if(saveT>3){saveT=0;save()}
