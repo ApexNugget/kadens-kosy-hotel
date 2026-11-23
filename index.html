@@ -29,20 +29,21 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
  text-shadow:4px 0 0 var(--ink),-4px 0 0 var(--ink),0 4px 0 var(--ink),0 -4px 0 var(--ink),4px 4px 0 var(--ink),-4px -4px 0 var(--ink),4px -4px 0 var(--ink),-4px 4px 0 var(--ink),0 10px 0 var(--ink);animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-1deg)}}
 .sub{position:relative;z-index:1;margin:6px 0 22px;font-size:clamp(18px,3vw,24px);color:#fff;text-shadow:2px 0 0 #2b6fc2,-2px 0 0 #2b6fc2,0 2px 0 #2b6fc2,0 -2px 0 #2b6fc2,0 4px 0 #2b6fc2}
-.games{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px;width:min(860px,100%)}
+.games{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:20px;width:min(1080px,100%)}
 .game{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#2b2140;border:5px solid var(--ink);border-radius:30px;padding:20px 18px 18px;
  box-shadow:0 10px 0 var(--ink),0 16px 28px #0003;transition:transform .12s;touch-action:manipulation;position:relative;overflow:hidden}
 .game:active{transform:translateY(8px);box-shadow:0 2px 0 var(--ink)}
 .game::before{content:"";position:absolute;inset:0 0 auto;height:45%;background:linear-gradient(#ffffff55,#fff0);pointer-events:none}
 .hotel{background:linear-gradient(#9be7a3,#4cb050)}
 .mart{background:linear-gradient(#ffb3ab,#ff5a4e)}
+.barber{background:linear-gradient(#f7c6ff,#b56bff)}
 .pic{font-size:clamp(80px,14vw,120px);line-height:1;filter:drop-shadow(0 6px 0 #0003);animation:wig 3s ease-in-out infinite}
-.mart .pic{animation-delay:-1.5s}
+.mart .pic{animation-delay:-1.5s}.barber .pic{animation-delay:-.7s}
 @keyframes wig{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg) scale(1.05)}}
 .name{margin-top:10px;font-size:clamp(28px,4.6vw,40px);font-weight:700;color:#fff;text-align:center;line-height:1.05;
  text-shadow:3px 0 0 var(--ink),-3px 0 0 var(--ink),0 3px 0 var(--ink),0 -3px 0 var(--ink),3px 3px 0 var(--ink),-3px -3px 0 var(--ink),3px -3px 0 var(--ink),-3px 3px 0 var(--ink),0 6px 0 var(--ink)}
 .what{margin:8px 0 12px;font-size:17px;font-weight:600;color:#fff;text-shadow:0 2px 0 #0004;text-align:center}
-.lv{background:#fffef6;border:3px solid var(--ink);border-radius:14px;padding:4px 14px;font-size:18px;font-weight:700;box-shadow:0 3px 0 #0003}
+.lv{margin-top:auto;background:#fffef6;border:3px solid var(--ink);border-radius:14px;padding:4px 14px;font-size:18px;font-weight:700;box-shadow:0 3px 0 #0003}
 .play{margin-top:14px;background:linear-gradient(#ffe680,#ffc21a);border:4px solid var(--ink);border-radius:18px;padding:8px 34px;font-size:28px;font-weight:700;box-shadow:0 5px 0 var(--ink);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.07)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
@@ -66,6 +67,13 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
   <div class="lv" id="mlv">⭐ New game</div>
   <div class="play">Play ▶</div>
  </a>
+ <a class="game barber" href="barber.html">
+  <div class="pic">✂️</div>
+  <div class="name">Kaden's Kutz</div>
+  <div class="what">Snip, buzz, grow and paint mad hair at the barbers</div>
+  <div class="lv" id="blv">💈 6 people</div>
+  <div class="play">Play ▶</div>
+ </a>
 </div>
 <script>
 {
@@ -75,6 +83,7 @@ const h=Math.max(lv('kadenHotel2'),lv('kadenHotel2_beach'),lv('kadenHotel2_snow'
 const hotels=[lv('kadenHotel2_beach')?1:0,lv('kadenHotel2_snow')?1:0].reduce((a,b)=>a+b,1);
 if(h)document.getElementById('hlv').textContent=`⭐ Level ${h}`+(hotels>1?` · ${hotels} hotels`:'');
 if(m)document.getElementById('mlv').textContent=`⭐ Level ${m}`;
+try{const n=JSON.parse(localStorage.getItem('kadenBarberPhotos')||'[]').length;if(n)document.getElementById('blv').textContent=`📸 ${n} photo${n>1?'s':''}`}catch(e){}
 for(let k=0;k<5;k++){const c=document.createElement('div');c.className='cloud';c.style.top=(4+Math.random()*40)+'vh';c.style.width=(70+Math.random()*80)+'px';
  c.style.animationDuration=(40+Math.random()*40)+'s';c.style.animationDelay=(-Math.random()*60)+'s';document.body.appendChild(c)}
 for(let k=0;k<14;k++){const t=document.createElement('div');t.className='tw';t.textContent='★';t.style.left=Math.random()*96+'vw';t.style.top=Math.random()*60+'vh';
