@@ -169,7 +169,7 @@ const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'
  ['f2n',-12.5,'room'],['f2n',12.5,'snack'],['f2s',15.75,'suite'],['f2n',-17.5,'room'],['f2n',17.5,'room'],['f2s',-15.75,'suite']];
 const OX=150;// floor 2 is built off to the side and reached by the lift
 const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,10,10,11,11,12,12,13,13, 7,7,7,8,8,9,9,10,11,12,13,14];
-const DEF={park:0,floors:1,stats:{},goals:[],coins:0,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
+const DEF={park:0,floors:1,stats:{},goals:[],coins:40,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
 let G=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object.assign(G,s)}catch(e){}
 // older saves had one Shauna and one Jay
@@ -297,10 +297,10 @@ for(let x=-27;x<=27;x+=2)if(Math.abs(x)>2)plane(.2,3.2,tm('wool:#f2c14e'),x,-22,
 plane(6,8,tm('tile:#bfeaea',4,5),17,5,.016);
 plane(5,5,tm('plank:#b8763a',3,3),-12.5,5.5,.016);
 function tree(x,z){box(.6,1.6,.6,tm('plank:#7a5230',.5,1.3),x,.8,z);box(2.2,1.6,2.2,tm('wool:#3f9f3a',2,1.5),x,2.2,z);box(1.2,.8,1.2,tm('wool:#4fb846'),x,3.3,z)}
-[[-25,14],[25,14],[-26,20],[26,20],[-18,4],[23,4],[-12,-8],[-21,-12],[-31,-26],[31,-26],[-10,-35],[10,-35],[0,-36],[-18,-2],[-14,-12],[24,-8],[31,-14],[-31,-14],[24,6]].forEach(([x,z])=>tree(x,z));
+[[-30,14],[30,14],[-30,19],[30,19],[-18,4],[23,4],[-12,-8],[-21,-12],[-31,-26],[31,-26],[-10,-35],[10,-35],[0,-36],[-18,-2],[-14,-12],[24,-8],[31,-14],[-31,-14],[24,6]].forEach(([x,z])=>tree(x,z));
 const FL=['#ff4d4d','#ffd23f','#ffffff','#b56bff','#ff8ad8'];
 for(let k=0;k<80;k++){const x=(Math.random()-.5)*56,z=(Math.random()-.5)*66-12;
- if(x>-29&&x<29&&z>-31&&z<11)continue;if(Math.abs(x)<24&&z>9&&z<23)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
+ if(x>-29&&x<29&&z>-31&&z<11)continue;if(Math.abs(x)<28&&z>9&&z<24)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
 for(let k=0;k<14;k++){const x=-(8.6+Math.random()*9),z=-1-Math.random()*12;if(Math.abs(x)>14&&z>-1)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
 const OW='brick:#d97a4a';
 wall(-10.15,-.15,-1.85,.15,OW,1.8);wall(1.85,-.15,10,.15,OW,1.8);wall(12,-.15,20.15,.15,OW,1.8);
@@ -473,17 +473,17 @@ function showFountain(){fountain.visible=!!G.fountain;fcol.on=!!G.fountain}
 function goldSeats(){toilets.forEach(t=>{if(t.seatM)t.seatM.material=mat(G.goldLoo?'#ffcf2e':'#dfe7ea')})}
 
 /* ---------- road and car park: every guest arrives by car ---------- */
-const ROADZ=21,AISLEZ=14.7,ROWZ=[12.6,16.8],SX=[6,8.4,10.8,13.2,15.6,18];
+const ROADZ=21,AISLEZ=14.7,ROWZ=[12.6,16.8],SX=[6,8.4,10.8,13.2,15.6,18,20.4,22.8];
 const asphalt=pix('#4a4f57',.06);asphalt.repeat.set(1,1);
 plane(110,4.2,mat(new THREE.MeshLambertMaterial({map:(()=>{const t=asphalt.clone();t.needsUpdate=true;t.repeat.set(40,2);return t})()})),0,ROADZ,.005);
 for(let x=-52;x<=52;x+=4)plane(1.8,.18,mat('#f4f1e8'),x,ROADZ,.012);
-[-1,1].forEach(sd=>{plane(17,8,mat(new THREE.MeshLambertMaterial({map:(()=>{const t=asphalt.clone();t.needsUpdate=true;t.repeat.set(8,4);return t})()})),sd*12.5,14.7,.004);
+[-1,1].forEach(sd=>{plane(21.5,8,mat(new THREE.MeshLambertMaterial({map:(()=>{const t=asphalt.clone();t.needsUpdate=true;t.repeat.set(10,4);return t})()})),sd*14.75,14.7,.004);
  plane(1.8,6.3,mat('#4a4f57'),sd*3.5,17.85,.006);
- ROWZ.forEach(z=>{for(let k=0;k<=6;k++)plane(.12,2.2,mat('#f4f1e8'),sd*(4.8+k*2.4),z,.012)})});
+ ROWZ.forEach(z=>{for(let k=0;k<=8;k++)plane(.12,2.2,mat('#f4f1e8'),sd*(4.8+k*2.4),z,.012)})});
 const parkL=label('🚗 Car park','#5d6b7a',.9);parkL.position.set(12.5,2.4,11);
 // spaces: 6 to start, the Manager menu adds rows of 6
 const SPOTS=[];[[1,0],[1,1],[-1,0],[-1,1]].forEach(([sd,row])=>SX.forEach(x=>SPOTS.push({x:sd*x,z:ROWZ[row],sd,row,car:null})));
-const SPACES=()=>6*(1+(G.park||0));
+const SPACES=()=>8*(1+(G.park||0));
 const cones=SPOTS.map(sp=>{const g=new THREE.Group();scene.add(g);box(.4,.06,.4,'#ff7a1a',sp.x,.03,sp.z,g);box(.24,.5,.24,'#ff7a1a',sp.x,.3,sp.z,g);box(.26,.1,.26,'#ffffff',sp.x,.34,sp.z,g);return g});
 function showSpaces(){cones.forEach((c,k)=>c.visible=k>=SPACES())}
 const CARC=['#e2366b','#2ec4f1','#ffd23f','#4cb050','#ff9f43','#ffffff','#7b2cbf','#2b2140'];
@@ -503,8 +503,30 @@ function stepCars(dt){for(let k=cars.length-1;k>=0;k--){const c=cars[k],m=c.m;
  else if(c.state==='in'){c.state='parked';const g=spawn(c);if(g)c.riders=1}
  else if(c.state==='out'){scene.remove(m);cars.splice(k,1)}
  if(c.state==='parked'&&c.riders<=0&&c.left){c.state='out';c.space.car=null;c.path=carOut(c);c.space=c.space}}}
+const BUSX=-5.5,BUSSTOP={x:0,z:19.2};
+box(.15,2.2,.15,'#5d6b7a',-3,1.1,19.4);box(.9,.9,.08,'#2ec4f1',-3,2.3,19.4);
+{const b=label('🚌 Bus stop','#2ec4f1',.75);b.position.set(-3,3.3,19.4)}
+let bus=null,busT=20;
+function busMesh(){const g=new THREE.Group();scene.add(g);
+ box(1.9,1.6,5.4,'#ff9f1c',0,1.15,0,g);box(1.96,.6,4.8,'#cfe8ff',0,1.5,.1,g);box(1.96,.14,5.42,'#e2366b',0,.75,0,g);box(1.92,.12,5.4,'#ffffff',0,1.98,0,g);
+ [[-.9,1.8],[.9,1.8],[-.9,-1.8],[.9,-1.8]].forEach(([x,z])=>{const w=cylm(.35,.25,'#1d1d1d',x,.35,z,g);w.rotation.z=Math.PI/2});
+ box(.4,.2,.06,'#fff6b0',-.6,.7,2.71,g);box(.4,.2,.06,'#fff6b0',.6,.7,2.71,g);g.rotation.y=Math.PI/2;return g}
+function stepBus(dt){busT-=dt;
+ if(!bus&&busT<=0){bus={m:busMesh(),state:'in',t:0};bus.m.position.set(-40,0,ROADZ+.2);busT=Math.max(14,34-level()*1.6)+Math.random()*8}
+ if(!bus)return;const m=bus.m;
+ if(bus.state==='in'){m.position.x+=Math.min(8*dt,Math.max(.6*dt,(BUSX-m.position.x)*1.6*dt));if(m.position.x>BUSX-.05){bus.state='stop';bus.t=0;
+   const room=12-Q.length-cars.filter(c=>c.state==='in').length,n=Math.max(1,Math.min(room,2+Math.floor(Math.random()*3)));
+   for(let k=0;k<n;k++)setTimeout(()=>walkIn(k),k*350)}}
+ else if(bus.state==='stop'){bus.t+=dt;if(bus.t>2.4)bus.state='out'}
+ else{m.position.x+=9*dt;if(m.position.x>60){scene.remove(m);bus=null}}}
+// a walk-in from the bus: some head for the restaurant, the rest join the queue
+function walkIn(k){const t=tables.find(t=>tableOpen(t)&&t.state==='free');
+ if(t&&Math.random()<.45){const g={m:person(pick(SHIRTS),pick(HAIR),pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b'])),state:'toEat',t:0,table:t,diner:true,
+   path:[{x:0,z:15},{x:0,z:10.6},{x:0,z:9},RDOOR,RIN,{x:t.seat.x,z:-1.4},t.seat]};
+  t.state='going';t.guest=g;g.m.position.set(-1+k*.6,0,BUSSTOP.z);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);return}
+ if(Q.length>=12)return;spawn(null,{x:-1+k*.6,z:BUSSTOP.z})}
 function carWalk(c){const sp=c.space;return[{x:0,z:10.6},{x:sp.sd*2.4,z:AISLEZ},{x:sp.x+sp.sd*1.1,z:AISLEZ},{x:sp.x+sp.sd*1.1,z:sp.z}]}
-const exitTail=g=>g.car?carWalk(g.car):[{x:0,z:13}];
+const exitTail=g=>g.car?carWalk(g.car):[{x:0,z:10.6},{x:0,z:19.2},{x:(Math.random()<.5?-1:1)*32,z:19.6}];
 
 /* ---------- the lift and Floor 2 ---------- */
 function liftBox(x,z){const g=new THREE.Group();scene.add(g);
@@ -555,7 +577,7 @@ function person(shirt,hair,skin='#f2c39b',pants='#3b5bab',hat,o={}){const g=new 
  g.userData={legL,legR,armL,armR,ph:0};return g}
 function animate(g,moving,dt,hold,ride){const u=g.userData;u.ph=moving&&!ride?u.ph+dt*12:u.ph*.8;const s=Math.sin(u.ph)*.7;
  u.legL.rotation.x=s;u.legR.rotation.x=-s;if(hold){u.armL.rotation.x=u.armR.rotation.x=-1.25}else if(ride){u.armL.rotation.x=u.armR.rotation.x=-.9}else{u.armL.rotation.x=-s*.8;u.armR.rotation.x=s*.8}}
-function walk(e,dt,speed=3.4){const m=e.m;if(!e.path.length){animate(m,false,dt,e.hold);return false}
+function walk(e,dt,speed=4.2){const m=e.m;if(!e.path.length){animate(m,false,dt,e.hold);return false}
  const tg=e.path[0],dx=tg.x-m.position.x,dz=tg.z-m.position.z,d=Math.hypot(dx,dz),s=speed*dt;
  if(d<=s){m.position.x=tg.x;m.position.z=tg.z;e.path.shift();if(tg.tele){m.position.x=tg.tele.x;m.position.z=tg.tele.z}}else{m.position.x+=dx/d*s;m.position.z+=dz/d*s;m.rotation.y=Math.atan2(dx,dz)}
  animate(m,true,dt,e.hold);if(e.tag)e.tag.position.set(m.position.x,2.4,m.position.z);return!e.path.length}
@@ -647,7 +669,7 @@ const plotPad=makePad(0,0,1.5),plotPad2=makePad(OX,0,1.5),liftPad=makePad(LIFT0.
 const ICON={room:'🛏️',loo:'🚽',snack:'🥤',suite:'👨‍👩‍👧'},NAME={room:'a new bedroom',loo:'new toilets',snack:'a snack bar',suite:'a family suite'},TITLE={room:'New bedroom',loo:'New toilets',snack:'Snack bar',suite:'Family suite (sleeps 3)'};
 const nextPlot=(fl=0)=>plots.findIndex(p=>p.fl===fl&&!G.built[p.i]);
 const builtCount=()=>G.built.filter(Boolean).length-2-(G.floors>1?2:0);
-const plotCost=i=>{const n=builtCount(),b=30+22*n+4*n*n,t=plots[i].type;return Math.round(b*(t==='snack'?1.2:t==='loo'?.8:t==='suite'?1.6:1)/5)*5};
+const plotCost=i=>{const n=builtCount(),b=25+18*n+3*n*n,t=plots[i].type;return Math.round(b*(t==='snack'?1.2:t==='loo'?.8:t==='suite'?1.6:1)/5)*5};
 
 /* arrow pointing at the next job */
 const arrow=new THREE.Group();scene.add(arrow);
@@ -690,14 +712,14 @@ $('ans').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||!pu)return;
 
 /* ---------- Manager menu: hire staff, upgrade each person, buy hotel perks ---------- */
 const PERKS=[
- {id:'park',icon:'🚗',names:['Bigger car park (+6 spaces)','Bigger car park (+6 spaces)','Huge car park (+6 spaces)'],desc:'More cars means more guests at once',lvs:[3,6,9],costs:[120,260,450],get:()=>G.park,buy:()=>{G.park++;showSpaces()}},
+ {id:'park',icon:'🚗',names:['Bigger car park (+8 spaces)','Bigger car park (+8 spaces)','Huge car park (+8 spaces)'],desc:'More cars means more guests at once',lvs:[3,6,9],costs:[120,260,450],get:()=>G.park,buy:()=>{G.park++;showSpaces()}},
  {id:'shoes',icon:'👟',names:['Fast shoes'],desc:'Kaden walks faster',lvs:[2],costs:[40],get:()=>G.shoes,buy:()=>G.shoes=1},
  {id:'bag',icon:'🎒',names:['Bigger bag'],desc:'Carry more paper, spray and burgers',lvs:[4],costs:[90],get:()=>G.bag,buy:()=>G.bag=1},
  {id:'beds',icon:'✨',names:['Comfy beds','TVs in every room'],desc:'Every guest pays more',lvs:[4,7],costs:[120,300],get:()=>G.beds,buy:()=>{G.beds++;styleBeds()}},
- {id:'fountain',icon:'⛲',names:['Lobby fountain'],desc:'+$3 extra at every check-in',lvs:[5],costs:[200],get:()=>G.fountain,buy:()=>{G.fountain=1;showFountain()}},
+ {id:'fountain',icon:'⛲',names:['Lobby fountain'],desc:'+$6 extra at every check-in',lvs:[5],costs:[200],get:()=>G.fountain,buy:()=>{G.fountain=1;showFountain()}},
  {id:'food',icon:'🍔',names:['Tastier burgers','Tastier burgers ★★','Tastier burgers ★★★'],desc:'Diners pay more for their meal',lvs:[5,7,10],costs:[150,300,500],rest:1,get:()=>G.food,buy:()=>G.food++},
  {id:'snack',icon:'🥤',names:['Snack bar boost','Snack bar boost ★★'],desc:'Snack bars make more cash',lvs:[6,9],costs:[150,320],get:()=>G.snackUp,buy:()=>G.snackUp++},
- {id:'gold',icon:'🚽',names:['Golden toilets'],desc:'Toilet tips go from $3 to $6',lvs:[8],costs:[250],get:()=>G.goldLoo,buy:()=>{G.goldLoo=1;goldSeats()}}];
+ {id:'gold',icon:'🚽',names:['Golden toilets'],desc:'Toilet tips go from $5 to $10',lvs:[8],costs:[250],get:()=>G.goldLoo,buy:()=>{G.goldLoo=1;goldSeats()}}];
 function perkState(p){const l=p.get()||0;if(l>=p.names.length)return{max:1,l};
  return{l,cost:p.costs[l],name:p.names[l],lock:p.rest&&!G.rest?'Needs the restaurant':level()<p.lvs[l]?'Level '+p.lvs[l]:''}}
 let tab='staff';const stars3=l=>'★'.repeat(l)+'☆'.repeat(3-l);
@@ -741,7 +763,7 @@ const GOALT=[
  {type:'serve',icon:'🍔',text:n=>`Serve ${n} burgers`,n:[2,4,6],need:()=>G.rest},
  {type:'spray',icon:'🧴',text:n=>`Grab ${n} cleaning sprays`,n:[3,5,8]}];
 function newGoal(){const pool=GOALT.filter(t=>(!t.need||t.need())&&!G.goals.some(g=>g.type===t.type)),t=pick(pool),tier=Math.min(2,Math.floor((level()-1)/4));
- return{type:t.type,need:t.n[tier],start:G.stats[t.type]||0,reward:Math.round((20+9*level())*(1+tier*.4)/5)*5}}
+ return{type:t.type,need:t.n[tier],start:G.stats[t.type]||0,reward:Math.round((40+15*level())*(1+tier*.4)/5)*5}}
 function fillGoals(){while(G.goals.length<3)G.goals.push(newGoal())}
 const gProg=g=>Math.min(g.need,(G.stats[g.type]||0)-g.start);
 let goalsHTML='';
@@ -759,11 +781,11 @@ const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd2
 const HAIR=['#2b2140','#5a3a22','#e0b04a','#b5523b','#d9d9d9','#111111'];
 let guests=[],Q=[],spawnT=1,ck=0;
 // the queue snakes back and forth so up to 8 guests can wait
-const slot=i=>i<4?{x:DX,z:DZ+1.7+i*1.3}:{x:DX-1.4,z:DZ+1.7+(7-i)*1.3};
-function spawn(car){const vip=G.served>=5&&Math.random()<.15;
+const slot=i=>{const c=i>>2,j=i&3;return{x:DX-c*1.4,z:DZ+1.7+(c%2?3-j:j)*1.3}};
+function spawn(car,foot){const vip=G.served>=5&&Math.random()<.15;
  const fromCar=car?[{x:car.space.x+car.space.sd*1.1,z:AISLEZ},{x:car.space.sd*2.4,z:AISLEZ},{x:0,z:10.6}]:[];
- const g={vip,car,m:person(vip?'#7b2cbf':pick(SHIRTS),pick(HAIR),pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b','#4a4a4a']),vip?'crown':undefined),path:[...fromCar,{x:0,z:9},...(Q.length>=4?[{x:DX-1.4,z:9.4}]:[]),slot(Q.length)],state:'queue',t:0,arrived:false};
- if(car)g.m.position.set(car.space.x+car.space.sd*1.1,0,car.space.z);else g.m.position.set(0,0,12);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);Q.push(g);if(vip)say(g,'👑 VIP',3);return g}
+ const g={vip,car,m:person(vip?'#7b2cbf':pick(SHIRTS),pick(HAIR),pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b','#4a4a4a']),vip?'crown':undefined),path:[...fromCar,...(foot?[{x:0,z:15},{x:0,z:10.6}]:[]),{x:0,z:9},...(Q.length>=4?[{x:DX-1.4*(Q.length>>2),z:9.4}]:[]),slot(Q.length)],state:'queue',t:0,arrived:false};
+ if(car)g.m.position.set(car.space.x+car.space.sd*1.1,0,car.space.z);else if(foot)g.m.position.set(foot.x,0,foot.z);else g.m.position.set(0,0,12);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);Q.push(g);if(vip)say(g,'👑 VIP',3);return g}
 function say(g,t,sec=2){setLabel(g.icon,t);g.icon.visible=true;g.iconT=sec}
 const freeRoom=()=>rooms.find(r=>!r.occ&&!r.dirty&&!r.broken);
 const cashX=()=>boost.cash>0?2:1;
@@ -773,7 +795,7 @@ function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;r.occN=1;g.room=r;g.sp
  if(r.suite){const n=1+(Math.random()<.5?1:0);for(let k=1;k<=n;k++){const kid=k===n||Math.random()<.5;
   const f={m:person(pick(SHIRTS),pick(HAIR),g.m.userData.skin||pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b'])),room:r,spot:k,state:'toRoom',t:0,path:[{x:DX+(k*.7),z:DZ+2.6},...g.path]};
   if(kid)f.m.scale.setScalar(.72);f.m.position.set(DX+k*.8,0,DZ+3.2);if(g.car){f.car=g.car;g.car.riders++}f.icon=label('',undefined,.9);f.icon.visible=false;guests.push(f);r.occN++}}
- const pay=(Math.round([10,15,22][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?3:0))*(g.vip?3:1)*cashX();
+ const pay=(Math.round([22,32,45][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?6:0))*(g.vip?3:1)*cashX();
  fly(billGeo,billMat,g.m.position.clone().setY(1.2),()=>W3(PX,.6,PZ),.5,()=>{G.pile+=pay;drawPile();sfx.cash()});
  stat('checkin');if(g.vip)stat('vip');sfx.ding();stars(DX,1.6,DZ,g.vip?14:5,2.5);fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
  Q.forEach((q,i)=>{q.path=[slot(i)];q.arrived=false});save()}
@@ -792,17 +814,17 @@ function afterVisit(g,out,from){const free=toilets.filter(t=>t.open()&&!t.occ&&!
  else{g.state='exit';g.path=[...out,...between(from,LOBBY),{x:1.4,z:8.6},...exitTail(g)]}}
 function arrive(g){
  if(g.state==='queue'){g.arrived=true;g.m.rotation.y=Math.PI}
- else if(g.state==='toRoom'){const p=g.room.p,s=LP(p,3.3,g.room.suite?SUITE_SPOTS[g.spot||0]:0);g.state='sleep';g.t=9;g.m.rotation.order='YXZ';g.m.rotation.set(-Math.PI/2,Math.atan2(-p.ux,-p.uz),0);g.m.position.set(s.x,.72,s.z);
+ else if(g.state==='toRoom'){const p=g.room.p,s=LP(p,3.3,g.room.suite?SUITE_SPOTS[g.spot||0]:0);g.state='sleep';g.t=6;g.m.rotation.order='YXZ';g.m.rotation.set(-Math.PI/2,Math.atan2(-p.ux,-p.uz),0);g.m.position.set(s.x,.72,s.z);
   setLabel(g.icon,'💤');g.icon.visible=true;g.iconT=99}
  else if(g.state==='toToilet'){g.state='loo';g.t=2.2;g.m.rotation.y=g.toilet.face}
  else if(g.state==='toEat'){g.state='hungry';g.sit=true;g.m.rotation.y=Math.PI/2;g.table.state='wait';setLabel(g.icon,'🍔 ?');g.icon.visible=true;g.iconT=999}
  else if(g.state==='exit'){g.dead=true}}
 function serveTable(t){if(!t.guest)return;t.state='eat';t.plate.visible=true;const g=t.guest;g.state='eating';g.t=3.5;say(g,'😋',3.6);sfx.pop()}
-function finishEat(g){const t=g.table,pay=Math.round((12+6*G.food)*(g.vip?2:1)*cashX());G.tp[t.i]=(G.tp[t.i]||0)+pay;drawTable(t);stars(t.x,1.2,t.z,6,2.5);fxAt(t.x,1.6,t.z,'+$'+pay);
+function finishEat(g){const t=g.table,pay=Math.round((22+10*G.food)*(g.vip?2:1)*cashX());G.tp[t.i]=(G.tp[t.i]||0)+pay;drawTable(t);stars(t.x,1.2,t.z,6,2.5);fxAt(t.x,1.6,t.z,'+$'+pay);
  t.plate.visible=false;t.state='free';t.guest=null;t.claim=null;g.sit=false;g.m.position.y=0;g.table=null;
  afterVisit(g,[{x:t.seat.x,z:-1.4},RIN,RDOOR],LOBBY)}
 function finishLoo(g){const t=g.toilet;t.occ=null;
- if(t.paper>0){t.paper--;const tip=(G.goldLoo?6:3)*cashX()*(g.vip?2:1);G.pile+=tip;drawPile();say(g,'😊 +$'+tip)}else{say(g,'😠 No paper!',2.5);sfx.sad()}
+ if(t.paper>0){t.paper--;const tip=(G.goldLoo?10:5)*cashX()*(g.vip?2:1);G.pile+=tip;drawPile();say(g,'😊 +$'+tip)}else{say(g,'😠 No paper!',2.5);sfx.sad()}
  if(level()>=3&&Math.random()<.04)breakIt(t);
  const b=t.bath;g.state='exit';g.path=b.lobby?[t.front,b.zone,BDOOR,{x:1.4,z:8.6},...exitTail(g)]:[t.front,b.p.din,b.p.cp,...between(b.p,LOBBY),{x:1.4,z:8.6},...exitTail(g)]}
 /* ---------- maintenance: blocked toilets, broken TVs, jammed snack machines ---------- */
@@ -815,7 +837,7 @@ function issues(){const a=[];
 const fixRoute=(i,from)=>i.p?[...from,{x:0,z:1},...between(LOBBY,i.p),i.p.din,i.spot]:[...from,BDOOR,LB.zone,i.spot];
 const fixBack=(i,home)=>i.p?[i.p.din,i.p.cp,...between(i.p,LOBBY),home]:[LB.zone,BDOOR,home];
 let lvT=null;
-function levelUp(){const L=level(),bonus=10*L;sfx.level();G.pile+=bonus;drawPile();stars(player.position.x,1.5,player.position.z,40,5);
+function levelUp(){const L=level(),bonus=30*L;sfx.level();G.pile+=bonus;drawPile();stars(player.position.x,1.5,player.position.z,40,5);
  const nw=[...STAFF.filter(e=>e.d.lv===L&&!e.d.free).map(e=>e.d.n),...(PLV.includes(L)?['🛏️']:[])].slice(0,4).join(', ');
  $('lvn').textContent=`LEVEL ${L}!`;$('lvnew').textContent=`+$${bonus} bonus`+(nw?`  ·  New: ${nw}`:'');
  const o=$('lvup');o.hidden=false;o.querySelector('.lt').style.animation='none';void o.offsetWidth;o.querySelector('.lt').style.animation='';
@@ -929,7 +951,8 @@ function step(dt){
  bump=Math.max(0,bump-dt*4);backG.scale.setScalar(1+bump*.25);
  let ringP=-1;
 
- spawnT-=dt;if(spawnT<=0){if(Q.length+cars.filter(c=>c.state==='in').length<8&&guests.length<44)spawnCar();spawnT=Math.max(1.3,7.5-level()*.35-rooms.length*.15)+Math.random()*1.5}
+ spawnT-=dt;if(spawnT<=0){if(Q.length+cars.filter(c=>c.state==='in').length<12&&guests.length<64)spawnCar();spawnT=Math.max(.9,6.5-level()*.35-rooms.length*.15)+Math.random()*1.2}
+ stepBus(dt);
 
  const atDesk=near(DX,DZ-1.5,1.3),front=Q[0],fr=freeRoom();
  const nr=receps.length,rr=receps.reduce((a,c)=>a+1+.5*sk(c),0);if(front&&front.arrived&&fr&&(atDesk||nr)){ck+=dt/(atDesk?.8:2.4/rr);if(atDesk)ringP=ck;if(ck>=1){ck=0;checkIn()}}else ck=0;
@@ -940,7 +963,7 @@ function step(dt){
   fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}};
  grab(()=>G.pile,v=>G.pile=v,PX,PZ,drawPile);
  tables.forEach(t=>{if(tableOpen(t))grab(()=>G.tp[t.i]||0,v=>G.tp[t.i]=v,t.x,t.z,()=>drawTable(t))});
- snacks.forEach(s=>{s.t+=dt;if(s.t>4){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=(2+G.snackUp)*cashX();drawSnack(s)}}
+ snacks.forEach(s=>{s.t+=dt;if(s.t>3){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=(4+2*G.snackUp)*cashX();drawSnack(s)}}
   grab(()=>G.sp[s.i],v=>G.sp[s.i]=v,s.px,s.pz,()=>drawSnack(s))});
 
  rollT+=dt;
