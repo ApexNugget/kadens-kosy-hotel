@@ -1,6 +1,9 @@
-# Kaden's Kosy Hotel
+# Kaden's Games
 
-A blocky, ad-free hotel game for the browser. Walk around with your finger, check guests in, clean rooms, refill the toilets, collect cash and build out the hotel.
+Blocky, ad-free games for the browser. The home page lets you pick one:
+
+- **Kaden's Kosy Hotel** (`hotel.html`): check guests in, clean rooms, refill the toilets, build out the hotel, then open the Beach Hotel and Snow Lodge.
+- **Kaden Mart** (`mart.html`): serve customers at the tills, fill the shelves from the stockroom, push trolleys back from the car park and grow the supermarket.
 
 Play: https://apexnugget.github.io/kadens-kosy-hotel/
 
