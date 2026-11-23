@@ -17,7 +17,7 @@
 /* VOICE: a messy, giggly toy barber shop - no rules, no fail, just mad hair
    IDEA: blocky people whose hair is made of little cubes you can snip, buzz, grow and paint
    LAYOUT: the person in the chair fills the screen, big round tools down the right (along the bottom on tall screens), turn buttons under the chair */
-:root{color-scheme:light;--ink:#3b2a1a}
+:root{color-scheme:light;--ink:#3b2a1a;--ts:66px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#9bd4ff;font:600 17px/1.25 Fredoka,"Arial Rounded MT Bold",system-ui,sans-serif;color:#2b2140;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
 #stage{position:fixed;inset:0;touch-action:none}
@@ -27,7 +27,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#9bd4ff;font:600 17px/
 #top{position:fixed;top:calc(10px + env(safe-area-inset-top));left:10px;display:flex;gap:8px;z-index:3;flex-wrap:wrap}
 #who{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;translate:-50% 0;z-index:2;background:linear-gradient(#ffe680,#ffc21a);border:3px solid var(--ink);border-radius:16px;padding:6px 18px;font-size:22px;font-weight:700;box-shadow:0 4px 0 #0005;white-space:nowrap;pointer-events:none}
 #tools{position:fixed;right:10px;top:50%;translate:0 -50%;display:grid;gap:9px;z-index:3}
-.tool{width:66px;height:66px;border-radius:50%;font-size:34px;padding:0;background:linear-gradient(#ffffff,#e6f4ff)}
+.tool{width:var(--ts);height:var(--ts);border-radius:50%;font-size:calc(var(--ts)*.5);padding:0;background:linear-gradient(#ffffff,#e6f4ff)}
 .tool[aria-pressed=true]{background:linear-gradient(#ffe680,#ffc21a);transform:scale(1.12);box-shadow:0 0 0 5px #fff,0 5px 0 #0005}
 .tool.reset{font-size:28px;background:linear-gradient(#ffd0d0,#ff9a9a);margin-top:6px}
 #sub{position:fixed;right:92px;top:50%;translate:0 -50%;display:grid;grid-template-columns:repeat(2,58px);gap:8px;z-index:3;background:#fffef6ee;border:3px solid var(--ink);border-radius:22px;padding:10px;box-shadow:0 5px 0 #0004;animation:pop .25s cubic-bezier(.2,1.6,.4,1)}
@@ -66,13 +66,28 @@ html,body{margin:0;height:100%;overflow:hidden;background:#9bd4ff;font:600 17px/
 #gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:10px 0}
 #gal img{width:100%;border:6px solid #fff;border-bottom-width:18px;box-shadow:0 3px 6px #0004;cursor:pointer}
 .go{font-size:24px;padding:8px 30px;background:linear-gradient(#6fdc78,#2f9e3c);color:#fff;border-color:#1f5e22;text-shadow:0 2px 0 #0004;margin-top:6px}
-@media(max-aspect-ratio:9/10){
- #tools{top:auto;translate:0 0;bottom:calc(84px + env(safe-area-inset-bottom));left:8px;right:8px;grid-auto-flow:column;justify-content:center;gap:6px}
- .tool{width:min(58px,11vw);height:min(58px,11vw);font-size:min(30px,6vw)}
- .tool.reset{margin:0 0 0 6px}
- #sub{right:auto;left:50%;top:auto;translate:-50% 0;bottom:calc(158px + env(safe-area-inset-bottom));grid-template-columns:repeat(6,52px)}
- #sub button{width:52px;height:52px;font-size:26px}
+/* short screens (a phone on its side): tools go in two columns so they all fit */
+@media(min-aspect-ratio:9/10) and (max-height:720px){
+ :root{--ts:min(60px,calc((100vh - 24px)/5 - 8px))}
+ #tools{grid-template-columns:repeat(2,var(--ts));gap:8px}
+ .tool.reset{margin-top:0}
+ .tool[aria-pressed=true]{transform:scale(1.06)}
+ #sub{right:calc(30px + 2*var(--ts));grid-template-columns:repeat(2,calc(var(--ts)*.9))}
+ #sub button{width:calc(var(--ts)*.9);height:calc(var(--ts)*.9);font-size:calc(var(--ts)*.45)}
  #hint{display:none}
+ #who{font-size:18px;padding:4px 12px;left:auto;right:calc(20px + 2*var(--ts));translate:0 0}
+ #turn .btn{width:60px;height:50px;font-size:26px}
+}
+/* tall screens (portrait): tools sit in two rows along the bottom */
+@media(max-aspect-ratio:9/10){
+ :root{--ts:min(62px,calc((100vw - 70px)/5))}
+ #tools{top:auto;translate:-50% 0;left:50%;right:auto;bottom:calc(80px + env(safe-area-inset-bottom));grid-template-columns:repeat(5,var(--ts));gap:8px}
+ .tool.reset{margin:0}
+ .tool[aria-pressed=true]{transform:scale(1.06)}
+ #sub{right:auto;left:50%;top:auto;translate:-50% 0;bottom:calc(100px + 2*var(--ts) + env(safe-area-inset-bottom));grid-template-columns:repeat(6,min(52px,calc((100vw - 100px)/6)))}
+ #sub button{width:min(52px,calc((100vw - 100px)/6));height:min(52px,calc((100vw - 100px)/6));font-size:min(26px,6vw)}
+ #hint{display:none}
+ #who{top:calc(66px + env(safe-area-inset-top));font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){#cursor{animation:none!important}}
 </style>
