@@ -121,6 +121,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <span class="pill" id="cash">$0</span>
  <span class="pill" id="carry">🧻 0/4</span>
  <span class="pill" id="spray">🧴 5/5</span>
+ <span class="pill" id="park">🚗 0/6</span>
  <span class="pill" id="lvl"><em>⭐</em> <span id="lvt">Level 1</span><i><b id="lvlbar"></b></i></span>
  <span id="boosts"></span>
  <div id="hint">Walk around with your finger 👆</div>
@@ -168,7 +169,7 @@ const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'
  ['f2n',-12.5,'room'],['f2n',12.5,'snack'],['f2s',15.75,'suite'],['f2n',-17.5,'room'],['f2n',17.5,'room'],['f2s',-15.75,'suite']];
 const OX=150;// floor 2 is built off to the side and reached by the lift
 const NP=ORDER.length,PLV=[1,1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,10,10,11,11,12,12,13,13, 7,7,7,8,8,9,9,10,11,12,13,14];
-const DEF={floors:1,stats:{},goals:[],coins:0,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
+const DEF={park:0,floors:1,stats:{},goals:[],coins:0,pile:0,built:[1,1],sp:{},rt:{},tp:{},stalls:[1,0,0],staff:{},rest:0,tables:2,food:0,fountain:0,snackUp:0,goldLoo:0,shoes:0,bag:0,beds:0,served:0,paid:{},mute:false};
 let G=JSON.parse(JSON.stringify(DEF));
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object.assign(G,s)}catch(e){}
 // older saves had one Shauna and one Jay
@@ -287,7 +288,7 @@ function wall(x1,z1,x2,z2,key='plank:#e8d9a8',h=1.6){const horiz=x2-x1>=z2-z1,c=
  segs.filter(([a,b])=>b-a>.05).forEach(([a,b])=>{const len=b-a,cx=horiz?(a+b)/2:c,cz=horiz?c:(a+b)/2,w=horiz?len:.3,d=horiz?.3:len;
   box(w,h,d,tm(key,len/1.2,h/1.2),cx,h/2,cz);C.push({x1:cx-w/2,x2:cx+w/2,z1:cz-d/2,z2:cz+d/2,on:true})})}
 plane(220,220,tm('grass',110,110),0,-12,-.02);
-plane(4,14,tm('gravel',2,7),0,17,-.01);
+plane(4,10,tm('gravel',2,5),0,15,-.01);
 plane(24,10,tm('checker',6,2.5),2,5);
 plane(4,20,tm('wool:#c8323a',2,10),0,-10,.015);
 plane(56,4,tm('wool:#c8323a',28,2),0,-22,.014);
@@ -296,10 +297,10 @@ for(let x=-27;x<=27;x+=2)if(Math.abs(x)>2)plane(.2,3.2,tm('wool:#f2c14e'),x,-22,
 plane(6,8,tm('tile:#bfeaea',4,5),17,5,.016);
 plane(5,5,tm('plank:#b8763a',3,3),-12.5,5.5,.016);
 function tree(x,z){box(.6,1.6,.6,tm('plank:#7a5230',.5,1.3),x,.8,z);box(2.2,1.6,2.2,tm('wool:#3f9f3a',2,1.5),x,2.2,z);box(1.2,.8,1.2,tm('wool:#4fb846'),x,3.3,z)}
-[[-6,14],[7,14],[-13,16],[17,16],[-18,4],[23,4],[-12,-8],[-21,-12],[-31,-26],[31,-26],[-10,-35],[10,-35],[0,-36],[-18,-2],[-14,-12],[24,-8],[31,-14],[-31,-14],[24,12]].forEach(([x,z])=>tree(x,z));
+[[-25,14],[25,14],[-26,20],[26,20],[-18,4],[23,4],[-12,-8],[-21,-12],[-31,-26],[31,-26],[-10,-35],[10,-35],[0,-36],[-18,-2],[-14,-12],[24,-8],[31,-14],[-31,-14],[24,6]].forEach(([x,z])=>tree(x,z));
 const FL=['#ff4d4d','#ffd23f','#ffffff','#b56bff','#ff8ad8'];
 for(let k=0;k<80;k++){const x=(Math.random()-.5)*56,z=(Math.random()-.5)*66-12;
- if(x>-29&&x<29&&z>-31&&z<11)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
+ if(x>-29&&x<29&&z>-31&&z<11)continue;if(Math.abs(x)<24&&z>9&&z<23)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
 for(let k=0;k<14;k++){const x=-(8.6+Math.random()*9),z=-1-Math.random()*12;if(Math.abs(x)>14&&z>-1)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
 const OW='brick:#d97a4a';
 wall(-10.15,-.15,-1.85,.15,OW,1.8);wall(1.85,-.15,10,.15,OW,1.8);wall(12,-.15,20.15,.15,OW,1.8);
@@ -471,6 +472,40 @@ const fcol={x1:FX-1,x2:FX+1,z1:FZ-1,z2:FZ+1,on:false};C.push(fcol);
 function showFountain(){fountain.visible=!!G.fountain;fcol.on=!!G.fountain}
 function goldSeats(){toilets.forEach(t=>{if(t.seatM)t.seatM.material=mat(G.goldLoo?'#ffcf2e':'#dfe7ea')})}
 
+/* ---------- road and car park: every guest arrives by car ---------- */
+const ROADZ=21,AISLEZ=14.7,ROWZ=[12.6,16.8],SX=[6,8.4,10.8,13.2,15.6,18];
+const asphalt=pix('#4a4f57',.06);asphalt.repeat.set(1,1);
+plane(110,4.2,mat(new THREE.MeshLambertMaterial({map:(()=>{const t=asphalt.clone();t.needsUpdate=true;t.repeat.set(40,2);return t})()})),0,ROADZ,.005);
+for(let x=-52;x<=52;x+=4)plane(1.8,.18,mat('#f4f1e8'),x,ROADZ,.012);
+[-1,1].forEach(sd=>{plane(17,8,mat(new THREE.MeshLambertMaterial({map:(()=>{const t=asphalt.clone();t.needsUpdate=true;t.repeat.set(8,4);return t})()})),sd*12.5,14.7,.004);
+ plane(1.8,6.3,mat('#4a4f57'),sd*3.5,17.85,.006);
+ ROWZ.forEach(z=>{for(let k=0;k<=6;k++)plane(.12,2.2,mat('#f4f1e8'),sd*(4.8+k*2.4),z,.012)})});
+const parkL=label('🚗 Car park','#5d6b7a',.9);parkL.position.set(12.5,2.4,11);
+// spaces: 6 to start, the Manager menu adds rows of 6
+const SPOTS=[];[[1,0],[1,1],[-1,0],[-1,1]].forEach(([sd,row])=>SX.forEach(x=>SPOTS.push({x:sd*x,z:ROWZ[row],sd,row,car:null})));
+const SPACES=()=>6*(1+(G.park||0));
+const cones=SPOTS.map(sp=>{const g=new THREE.Group();scene.add(g);box(.4,.06,.4,'#ff7a1a',sp.x,.03,sp.z,g);box(.24,.5,.24,'#ff7a1a',sp.x,.3,sp.z,g);box(.26,.1,.26,'#ffffff',sp.x,.34,sp.z,g);return g});
+function showSpaces(){cones.forEach((c,k)=>c.visible=k>=SPACES())}
+const CARC=['#e2366b','#2ec4f1','#ffd23f','#4cb050','#ff9f43','#ffffff','#7b2cbf','#2b2140'];
+const cars=[];
+function carMesh(col){const g=new THREE.Group();scene.add(g);
+ box(1.5,.55,2.7,col,0,.5,0,g);box(1.3,.5,1.5,'#cfe8ff',0,1.02,-.15,g);box(1.34,.1,1.54,col,0,1.3,-.15,g);
+ [[-.72,.85],[.72,.85],[-.72,-.85],[.72,-.85]].forEach(([x,z])=>{const w=cylm(.28,.22,'#1d1d1d',x,.28,z,g);w.rotation.z=Math.PI/2});
+ box(.3,.15,.06,'#fff6b0',-.45,.55,1.36,g);box(.3,.15,.06,'#fff6b0',.45,.55,1.36,g);box(.3,.12,.06,'#ff4d4d',-.45,.55,-1.36,g);box(.3,.12,.06,'#ff4d4d',.45,.55,-1.36,g);return g}
+// cars come along the road, turn into the car park lane, then into their space
+function carIn(sp){const lane=sp.sd*3.5;return[{x:lane,z:ROADZ},{x:lane,z:AISLEZ},{x:sp.x,z:AISLEZ},{x:sp.x,z:sp.z}]}
+function carOut(c){const sp=c.space,lane=sp.sd*3.5,dir=sp.sd;return[{x:sp.x,z:AISLEZ},{x:lane,z:AISLEZ},{x:lane,z:ROADZ},{x:dir*60,z:ROADZ}]}
+function spawnCar(){const free=SPOTS.slice(0,SPACES()).filter(s=>!s.car);if(!free.length)return null;const sp=pick(free),dir=sp.sd;
+ const c={m:carMesh(pick(CARC)),space:sp,path:carIn(sp),state:'in',riders:0};sp.car=c;c.m.position.set(dir*30,0,ROADZ);cars.push(c);return c}
+function stepCars(dt){for(let k=cars.length-1;k>=0;k--){const c=cars[k],m=c.m;
+ if(c.path.length){const tg=c.path[0],dx=tg.x-m.position.x,dz=tg.z-m.position.z,d=Math.hypot(dx,dz),sp=(c.state==='in'&&c.path.length<=1?3:7)*dt;
+  if(d<=sp){m.position.x=tg.x;m.position.z=tg.z;c.path.shift()}else{m.position.x+=dx/d*sp;m.position.z+=dz/d*sp;const a=Math.atan2(dx,dz);let da=a-m.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));m.rotation.y+=da*Math.min(1,dt*10)}}
+ else if(c.state==='in'){c.state='parked';const g=spawn(c);if(g)c.riders=1}
+ else if(c.state==='out'){scene.remove(m);cars.splice(k,1)}
+ if(c.state==='parked'&&c.riders<=0&&c.left){c.state='out';c.space.car=null;c.path=carOut(c);c.space=c.space}}}
+function carWalk(c){const sp=c.space;return[{x:0,z:10.6},{x:sp.sd*2.4,z:AISLEZ},{x:sp.x+sp.sd*1.1,z:AISLEZ},{x:sp.x+sp.sd*1.1,z:sp.z}]}
+const exitTail=g=>g.car?carWalk(g.car):[{x:0,z:13}];
+
 /* ---------- the lift and Floor 2 ---------- */
 function liftBox(x,z){const g=new THREE.Group();scene.add(g);
  wall(x-1.4,z-.7,x-1.25,z+.75,'tile:#c9d1d8',2.2);wall(x+1.25,z-.7,x+1.4,z+.75,'tile:#c9d1d8',2.2);
@@ -581,7 +616,7 @@ function addStaff(e){const{role,k,d,id}=e;let m,o;
  if(role==='w'){m=person('#ffffff',d.hair,d.skin,'#2b2140',undefined,{bow:1});const hs=handStack(m,4,burgerGeo,burgerMat);o={home:WHOME[k],state:'idle',carry:0,tray:hs.items,hg:hs.hg,target:null,t:0};waiters.push(o)}
  Object.assign(o,{id,k,d,m,path:[],tag:nameTag(d.n,role==='m'?'#1d1d1d':role==='j'?d.suit:role==='r'?(d.suit||'#4cb050'):role==='c'?'#ff8c1a':'#2b2140')});
  m.position.set(o.home.x,0,o.home.z);if(role==='r'||role==='c')m.rotation.y=role==='r'?Math.PI:0;o.tag.position.set(o.home.x,2.4,o.home.z)}
-STAFF.forEach(e=>{if(G.staff[e.id])addStaff(e)});
+STAFF.forEach(e=>{if(G.staff[e.id])addStaff(e)});showSpaces();
 if(G.rest){rtape.visible=false;rcol.on=false}showTables();showFountain();
 const lockReason=e=>{const d=e.d;if(d.rest&&!G.rest)return'Needs the restaurant';if(d.needs&&!(G.staff.m0&&G.staff.j0))return'Hire Shauna & Jay first';if(level()<d.lv)return'Level '+d.lv;return''};
 const upCost=(e,l)=>Math.round([60,140,300][l]*(1+e.k*.15)/10)*10;
@@ -655,6 +690,7 @@ $('ans').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||!pu)return;
 
 /* ---------- Manager menu: hire staff, upgrade each person, buy hotel perks ---------- */
 const PERKS=[
+ {id:'park',icon:'🚗',names:['Bigger car park (+6 spaces)','Bigger car park (+6 spaces)','Huge car park (+6 spaces)'],desc:'More cars means more guests at once',lvs:[3,6,9],costs:[120,260,450],get:()=>G.park,buy:()=>{G.park++;showSpaces()}},
  {id:'shoes',icon:'👟',names:['Fast shoes'],desc:'Kaden walks faster',lvs:[2],costs:[40],get:()=>G.shoes,buy:()=>G.shoes=1},
  {id:'bag',icon:'🎒',names:['Bigger bag'],desc:'Carry more paper, spray and burgers',lvs:[4],costs:[90],get:()=>G.bag,buy:()=>G.bag=1},
  {id:'beds',icon:'✨',names:['Comfy beds','TVs in every room'],desc:'Every guest pays more',lvs:[4,7],costs:[120,300],get:()=>G.beds,buy:()=>{G.beds++;styleBeds()}},
@@ -722,10 +758,12 @@ fillGoals();if(G.gmin||innerWidth<600)$('goals').classList.add('min');
 const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd23f','#ff4d4d','#8d6e63'];
 const HAIR=['#2b2140','#5a3a22','#e0b04a','#b5523b','#d9d9d9','#111111'];
 let guests=[],Q=[],spawnT=1,ck=0;
-const slot=i=>({x:DX,z:DZ+1.7+i*1.3});
-function spawn(){const vip=G.served>=5&&Math.random()<.15;
- const g={vip,m:person(vip?'#7b2cbf':pick(SHIRTS),pick(HAIR),pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b','#4a4a4a']),vip?'crown':undefined),path:[{x:0,z:9},slot(Q.length)],state:'queue',t:0,arrived:false};
- g.m.position.set(0,0,12);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);Q.push(g);if(vip)say(g,'👑 VIP',3)}
+// the queue snakes back and forth so up to 8 guests can wait
+const slot=i=>i<4?{x:DX,z:DZ+1.7+i*1.3}:{x:DX-1.4,z:DZ+1.7+(7-i)*1.3};
+function spawn(car){const vip=G.served>=5&&Math.random()<.15;
+ const fromCar=car?[{x:car.space.x+car.space.sd*1.1,z:AISLEZ},{x:car.space.sd*2.4,z:AISLEZ},{x:0,z:10.6}]:[];
+ const g={vip,car,m:person(vip?'#7b2cbf':pick(SHIRTS),pick(HAIR),pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b','#4a4a4a']),vip?'crown':undefined),path:[...fromCar,{x:0,z:9},...(Q.length>=4?[{x:DX-1.4,z:9.4}]:[]),slot(Q.length)],state:'queue',t:0,arrived:false};
+ if(car)g.m.position.set(car.space.x+car.space.sd*1.1,0,car.space.z);else g.m.position.set(0,0,12);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);Q.push(g);if(vip)say(g,'👑 VIP',3);return g}
 function say(g,t,sec=2){setLabel(g.icon,t);g.icon.visible=true;g.iconT=sec}
 const freeRoom=()=>rooms.find(r=>!r.occ&&!r.dirty&&!r.broken);
 const cashX=()=>boost.cash>0?2:1;
@@ -734,7 +772,7 @@ function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;r.occN=1;g.room=r;g.sp
  // a family suite: the rest of the family follows the guest who checked in
  if(r.suite){const n=1+(Math.random()<.5?1:0);for(let k=1;k<=n;k++){const kid=k===n||Math.random()<.5;
   const f={m:person(pick(SHIRTS),pick(HAIR),g.m.userData.skin||pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b'])),room:r,spot:k,state:'toRoom',t:0,path:[{x:DX+(k*.7),z:DZ+2.6},...g.path]};
-  if(kid)f.m.scale.setScalar(.72);f.m.position.set(DX+k*.8,0,DZ+3.2);f.icon=label('',undefined,.9);f.icon.visible=false;guests.push(f);r.occN++}}
+  if(kid)f.m.scale.setScalar(.72);f.m.position.set(DX+k*.8,0,DZ+3.2);if(g.car){f.car=g.car;g.car.riders++}f.icon=label('',undefined,.9);f.icon.visible=false;guests.push(f);r.occN++}}
  const pay=(Math.round([10,15,22][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?3:0))*(g.vip?3:1)*cashX();
  fly(billGeo,billMat,g.m.position.clone().setY(1.2),()=>W3(PX,.6,PZ),.5,()=>{G.pile+=pay;drawPile();sfx.cash()});
  stat('checkin');if(g.vip)stat('vip');sfx.ding();stars(DX,1.6,DZ,g.vip?14:5,2.5);fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
@@ -751,7 +789,7 @@ function leaveRoom(g){const r=g.room,p=r.p;
 function afterVisit(g,out,from){const free=toilets.filter(t=>t.open()&&!t.occ&&!t.broken);
  if(free.length&&Math.random()<.65){const t=pick(free);t.occ=g;g.toilet=t;g.state='toToilet';
   const b=t.bath;g.path=b.lobby?[...out,...between(from,LOBBY),BDOOR,b.zone,t.front,t.seat]:[...out,...between(from,b.p),b.p.din,t.front,t.seat]}
- else{g.state='exit';g.path=[...out,...between(from,LOBBY),{x:1.4,z:8.6},{x:0,z:13}]}}
+ else{g.state='exit';g.path=[...out,...between(from,LOBBY),{x:1.4,z:8.6},...exitTail(g)]}}
 function arrive(g){
  if(g.state==='queue'){g.arrived=true;g.m.rotation.y=Math.PI}
  else if(g.state==='toRoom'){const p=g.room.p,s=LP(p,3.3,g.room.suite?SUITE_SPOTS[g.spot||0]:0);g.state='sleep';g.t=9;g.m.rotation.order='YXZ';g.m.rotation.set(-Math.PI/2,Math.atan2(-p.ux,-p.uz),0);g.m.position.set(s.x,.72,s.z);
@@ -766,7 +804,7 @@ function finishEat(g){const t=g.table,pay=Math.round((12+6*G.food)*(g.vip?2:1)*c
 function finishLoo(g){const t=g.toilet;t.occ=null;
  if(t.paper>0){t.paper--;const tip=(G.goldLoo?6:3)*cashX()*(g.vip?2:1);G.pile+=tip;drawPile();say(g,'😊 +$'+tip)}else{say(g,'😠 No paper!',2.5);sfx.sad()}
  if(level()>=3&&Math.random()<.04)breakIt(t);
- const b=t.bath;g.state='exit';g.path=b.lobby?[t.front,b.zone,BDOOR,{x:1.4,z:8.6},{x:0,z:13}]:[t.front,b.p.din,b.p.cp,...between(b.p,LOBBY),{x:1.4,z:8.6},{x:0,z:13}]}
+ const b=t.bath;g.state='exit';g.path=b.lobby?[t.front,b.zone,BDOOR,{x:1.4,z:8.6},...exitTail(g)]:[t.front,b.p.din,b.p.cp,...between(b.p,LOBBY),{x:1.4,z:8.6},...exitTail(g)]}
 /* ---------- maintenance: blocked toilets, broken TVs, jammed snack machines ---------- */
 function breakIt(o){if(o.broken)return;o.broken=true;o.fix=0;o.fixClaim=null;if(o.bicon)o.bicon.visible=true;if(o.screen)o.screen.material=mat('#55585c');sfx.no()}
 function fixDone(o,sp){o.broken=false;o.fix=0;o.fixClaim=null;if(o.bicon)o.bicon.visible=false;if(o.screen)o.screen.material=mat('#4dd2d2');sfx.clean();stars(sp.x,1.2,sp.z,14,3);fxAt(sp.x,1.8,sp.z,'Fixed! 🔧')}
@@ -863,7 +901,7 @@ const HC={};function put(id,v,prop='textContent'){if(HC[id+prop]===v)return fals
 let shownCash=0,bumpT=0;
 function hud(dt=1){const before=Math.round(shownCash);shownCash+=(G.coins-shownCash)*Math.min(1,dt*9);if(Math.abs(G.coins-shownCash)<.5)shownCash=G.coins;
  const sc=Math.round(shownCash);put('cash','$'+sc);bumpT-=dt;if(sc>before&&bumpT<=0){bumpT=.25;const c=$('cash');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
- put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('snd',G.mute?'🔇':'🔊');
+ put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇':'🔊');
  const L=level(),a=LEVELS[L-1],b=LEVELS[L];put('lvt','Level '+L);put('lvlbar',(b?(G.served-a)/(b-a)*100:100)+'%','width');
  put('boosts',(boost.speed>0?`<span class="pill">🛴 ${Math.ceil(boost.speed)}s</span>`:'')+(boost.cash>0?`<span class="pill">💵×2 ${Math.ceil(boost.cash)}s</span>`:'')+(boost.magnet>0?`<span class="pill">🧲 ${Math.ceil(boost.magnet)}s</span>`:''),'innerHTML')}
 function setHint(t,x,z){if(x!==undefined&&floorOf(x)!==floorOf(player.position.x)){const L=floorOf(player.position.x)?LIFT1:LIFT0;x=L.x;z=L.z;t+=' (take the 🛗 lift)'}if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
@@ -891,7 +929,7 @@ function step(dt){
  bump=Math.max(0,bump-dt*4);backG.scale.setScalar(1+bump*.25);
  let ringP=-1;
 
- spawnT-=dt;if(spawnT<=0){if(Q.length<4&&guests.length<20)spawn();spawnT=Math.max(2.2,8-rooms.length*.5)+Math.random()*2}
+ spawnT-=dt;if(spawnT<=0){if(Q.length+cars.filter(c=>c.state==='in').length<8&&guests.length<44)spawnCar();spawnT=Math.max(1.3,7.5-level()*.35-rooms.length*.15)+Math.random()*1.5}
 
  const atDesk=near(DX,DZ-1.5,1.3),front=Q[0],fr=freeRoom();
  const nr=receps.length,rr=receps.reduce((a,c)=>a+1+.5*sk(c),0);if(front&&front.arrived&&fr&&(atDesk||nr)){ck+=dt/(atDesk?.8:2.4/rr);if(atDesk)ringP=ck;if(ck>=1){ck=0;checkIn()}}else ck=0;
@@ -983,7 +1021,8 @@ function step(dt){
   if(g.state==='loo'){g.t-=dt;if(g.t<=0)finishLoo(g)}
   if(g.state==='eating'){g.t-=dt;if(g.t<=0)finishEat(g)}
   if(g.sit){const u=g.m.userData;u.legL.rotation.x=u.legR.rotation.x=-1.45;g.m.position.y=-.1}});
- guests=guests.filter(g=>{if(g.dead){scene.remove(g.m);killLabel(g.icon);return false}return true});
+ guests=guests.filter(g=>{if(g.dead){scene.remove(g.m);killLabel(g.icon);if(g.car){g.car.riders--;g.car.left=true}return false}return true});
+ stepCars(dt);
  maids.forEach(c=>stepMaid(c,dt));jans.forEach(s=>stepJan(s,dt));waiters.forEach(w=>stepWaiter(w,dt));chefs.forEach(c=>stepChef(c,dt,now));
  stepFlyers(dt);stepStars(dt);
 
@@ -1018,7 +1057,7 @@ function step(dt){
  else setHint(atDesk?'Wait here for guests 🛎️':'Go stand behind the desk for the next guest 🛎️',atDesk?undefined:DX,DZ-1.5);
 
  const asp=innerWidth/innerHeight,want=asp<1?14:19,D=Math.max(16,Math.min(32,want/2/(Math.tan(21*Math.PI/180)*asp)));
- const up=floorOf(P.x),oy=D*.84,oz=D*.54,cz=up?Math.max(-3,Math.min(6,P.z)):Math.max(-26,Math.min(6,P.z)),cx=up?Math.max(OX-12,Math.min(OX+12,P.x)):Math.max(-24,Math.min(24,P.x));
+ const up=floorOf(P.x),oy=D*.84,oz=D*.54,cz=up?Math.max(-3,Math.min(6,P.z)):Math.max(-26,Math.min(8.5,P.z+(P.z>5?2:0))),cx=up?Math.max(OX-12,Math.min(OX+12,P.x)):Math.max(-24,Math.min(24,P.x));
  const camK=camSnap?1:Math.min(1,dt*4);camSnap=false;
  cam.position.x+=(cx-cam.position.x)*camK;cam.position.y=oy;cam.position.z+=(cz+oz-cam.position.z)*camK;
  cam.lookAt(cam.position.x,0,cam.position.z-oz);
