@@ -101,6 +101,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 .ups .btn{font-size:15px;padding:5px 10px;min-height:42px;background:linear-gradient(#6fdc78,#2f9e3c);border-color:#1f5e22}
 .ups .max{font-size:15px;color:#2e8b3a;font-weight:700;padding:0 4px}
 .lockt{font-size:15px;color:#8a6a00;font-weight:700}
+.hcard{display:flex;align-items:center;gap:12px;border:3px solid #3b2a1a;border-radius:18px;padding:10px 12px;box-shadow:0 3px 0 #0002;flex-wrap:wrap;color:#2b2140}
+.hcard .he{font-size:40px;width:60px;height:60px;border-radius:16px;display:grid;place-items:center;border:3px solid #3b2a1a;flex:none}
+.hcard.lock{filter:grayscale(.7);opacity:.75}
 .sect{font-size:16px;font-weight:700;color:#8a4a00;margin:6px 4px 0}
 #lvup{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:8;overflow:hidden}
 #lvup .rays{position:absolute;width:160vmax;height:160vmax;background:repeating-conic-gradient(#ffd23f40 0 9deg,transparent 9deg 18deg);animation:spin 8s linear infinite;-webkit-mask:radial-gradient(circle,#000 0,transparent 55%);mask:radial-gradient(circle,#000 0,transparent 55%)}
@@ -127,6 +130,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <div id="hint">Walk around with your finger 👆</div>
  <button class="btn mgr" id="mgr">🏨 Manager<i id="dot" hidden>!</i></button>
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
+ <button class="btn small" id="maps">🗺️ Hotels</button>
  <button class="btn small" id="reset">Start over</button>
 </div>
 <div id="goals"><button id="gh">🎯 Goals</button><div id="glist"></div></div>
@@ -135,11 +139,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <circle r="13" fill="#ffd23f" stroke="#3b2a1a" stroke-width="3"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#infp"/></animateMotion></circle></svg>
 <div id="lvup" hidden><div class="rays"></div><div class="lt"><b id="lvn">LEVEL 2!</b><small id="lvnew"></small></div></div>
 <div class="modal" id="start"><div class="card">
- <div class="logo">🏨</div>
- <h1>Kaden's Kosy Hotel</h1>
+ <div class="logo" id="hlogo">🏨</div>
+ <h1 id="htitle">Kaden's Kosy Hotel</h1>
  <p>Put your finger on the screen and slide it to walk.</p>
  <p>🛎️ Stand behind the desk to check guests in<br>🧴 Grab spray and 🧻 paper from the closet<br>🧹 Walk into messy rooms to clean them<br>💵 Stand on a green square and tap <b>Buy</b> to build<br>🏨 Open <b>Manager</b> to hire staff and upgrade them<br>🛴 Find power-ups and answer a maths question!</p>
- <button class="btn go" id="go">Play ▶</button>
+ <button class="btn go" id="go">Play ▶</button><br>
+ <button class="btn small" id="maps0" style="margin-top:12px;font-size:17px">🗺️ Choose a hotel</button>
 </div></div>
 <div class="modal" id="menu" hidden><div class="card wide">
  <div class="mt" id="mtabs"><button class="btn" data-tab="staff" aria-pressed="true">👥 Staff</button><button class="btn" data-tab="hotel" aria-pressed="false">⭐ Hotel upgrades</button></div>
@@ -148,6 +153,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <button class="btn small" id="mclose">Back to the hotel ▶</button>
 </div></div>
 <div id="buy" hidden><div class="bi" id="bicon">🛏️</div><div><b id="bname">New bedroom</b><small id="bsub">Tap to build</small></div><button class="btn" id="bbtn">$56</button></div>
+<div class="modal" id="hotels" hidden><div class="card wide">
+ <div class="mtop" style="margin-top:0"><h2>🗺️ Your hotels</h2></div>
+ <p style="margin:4px 0 0;font-size:16px">Each hotel has its own money and level. Get a hotel to <b>Level 8</b> to open the next one!</p>
+ <div class="list" id="hlist"></div>
+ <button class="btn small" id="hclose">Back ▶</button>
+</div></div>
 <div class="modal" id="pu" hidden><div class="card">
  <h2 id="putitle">🛴 Scooter!</h2>
  <div id="pics"></div><div id="q"></div>
@@ -159,7 +170,18 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 <script>
 {
 const $=id=>document.getElementById(id);
-const KEY='kadenHotel2';
+/* ---------- hotels: each one has its own save, look and money multiplier ---------- */
+const LVL_T=[0,3,8,15,24,35,50,70,95,125,160,200,250,310,380,460,550,650,760,880];
+const HOTELS=[
+ {id:'kosy',key:'kadenHotel2',name:"Kaden's Kosy Hotel",emoji:'🏨',mult:1,sign:'#4cb050',sky:'#8fd3f7',ground:'#5dbb46',far:'#58a845',brick:'#d97a4a',check:'#8fd3f4',carpet:'#c8323a',fog:[48,95],blurb:'The first hotel'},
+ {id:'beach',key:'kadenHotel2_beach',name:"Kaden's Beach Hotel",emoji:'🏖️',mult:1.6,need:'kosy',sign:'#14a3a3',sky:'#7fd6ff',ground:'#f2d38b',far:'#3fb5e8',brick:'#f2c78f',check:'#7fe0d6',carpet:'#14a3a3',fog:[50,100],blurb:'Sand, sea and palm trees'},
+ {id:'snow',key:'kadenHotel2_snow',name:"Kaden's Snow Lodge",emoji:'🏔️',mult:2.4,need:'beach',sign:'#3a6ea5',sky:'#cfe6f5',ground:'#eef6fb',far:'#e8f2f8',brick:'#8b5a2b',check:'#ffcfa1',carpet:'#b3263a',fog:[36,80],blurb:'Snowmen, pine trees and falling snow',logs:1}];
+const UNLOCK_LV=8;
+const lvOfSave=k=>{try{const s=JSON.parse(localStorage.getItem(k)||'null');return s?LVL_T.filter(t=>(s.served||0)>=t).length:0}catch(e){return 0}};
+const unlocked=h=>!h.need||lvOfSave(HOTELS.find(x=>x.id===h.need).key)>=UNLOCK_LV;
+let TH=HOTELS[0];try{const a=HOTELS.find(h=>h.id===localStorage.getItem('kadenActive'));if(a&&unlocked(a))TH=a}catch(e){}
+const KEY=TH.key;
+document.title=TH.name;
 /* build order: the main corridor first, then the wings of the T. Each plot already knows what it will be. */
 const ORDER=[['m',-1,0,'room'],['m',1,0,'room'],['m',-1,1,'room'],['m',1,1,'loo'],['m',-1,2,'room'],['m',1,2,'snack'],['m',-1,3,'room'],['m',1,3,'room'],
  ['n',0,'room'],['n',-5,'room'],['n',5,'loo'],['s',-10.5,'room'],['s',10.5,'snack'],['n',-10,'room'],['n',10,'room'],['s',-15.5,'loo'],['s',15.5,'room'],['n',-15,'room'],['n',15,'snack'],
@@ -175,7 +197,7 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.built)G=Object
 // older saves had one Shauna and one Jay
 if(G.shauna&&!G.maids)G.maids=1;if(G.jay&&!G.jans)G.jans=1;delete G.shauna;delete G.jay;if(!G.staff)G.staff={};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}};
-const LEVELS=[0,3,8,15,24,35,50,70,95,125,160,200,250,310,380,460,550,650,760,880];
+const LEVELS=LVL_T;
 const level=()=>LEVELS.filter(t=>G.served>=t).length;
 const boost={speed:0,cash:0,magnet:0};
 function pick(a){return a[Math.random()*a.length|0]}
@@ -204,8 +226,8 @@ const bricks=c=>x=>{x.fillStyle=c;for(let y=3;y<16;y+=4){x.fillRect(0,y,16,1);co
 const tiles=c=>x=>{x.fillStyle=c;x.fillRect(0,7,16,1);x.fillRect(7,0,1,16);x.fillRect(0,15,16,1);x.fillRect(15,0,1,16)};
 const BASE={};
 function tex(key){if(BASE[key])return BASE[key];let t;
- if(key==='grass')t=pix('#5dbb46',.14);
- else if(key==='checker')t=pix('#f4f1e8',.05,x=>{for(let i=0;i<16;i++)for(let j=0;j<16;j++)if(((i>>3)+(j>>3))%2){x.fillStyle=shade('#8fd3f4',(Math.random()-.5)*.06);x.fillRect(i,j,1,1)}});
+ if(key==='grass')t=pix(TH.ground,TH.id==='kosy'?.14:.07);
+ else if(key==='checker')t=pix('#f4f1e8',.05,x=>{for(let i=0;i<16;i++)for(let j=0;j<16;j++)if(((i>>3)+(j>>3))%2){x.fillStyle=shade(TH.check,(Math.random()-.5)*.06);x.fillRect(i,j,1,1)}});
  else if(key==='gravel')t=pix('#a89f91',.25);
  else if(key.startsWith('plank:')){const c=key.slice(6);t=pix(c,.08,planks(shade(c,-.14)),16,16,1)}
  else if(key.startsWith('brick:')){const c=key.slice(6);t=pix(c,.08,bricks(shade(c,-.16)),16,16,1)}
@@ -226,7 +248,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const ANISO=Math.min(8,renderer.capabilities.getMaxAnisotropy());
 $('stage').appendChild(renderer.domElement);
-const scene=new THREE.Scene();scene.background=new THREE.Color('#8fd3f7');scene.fog=new THREE.Fog('#8fd3f7',48,95);
+const scene=new THREE.Scene();scene.background=new THREE.Color(TH.sky);scene.fog=new THREE.Fog(TH.sky,TH.fog[0],TH.fog[1]);
 const cam=new THREE.PerspectiveCamera(42,1,.1,200);
 scene.add(new THREE.HemisphereLight(0xe8f6ff,0x8f7d62,.78));
 const sun=new THREE.DirectionalLight(0xfff1d6,.78);sun.castShadow=true;sun.shadow.bias=-.0006;sun.shadow.normalBias=.02;
@@ -290,19 +312,31 @@ function wall(x1,z1,x2,z2,key='plank:#e8d9a8',h=1.6){const horiz=x2-x1>=z2-z1,c=
 plane(220,220,tm('grass',110,110),0,-12,-.02);
 plane(4,10,tm('gravel',2,5),0,15,-.01);
 plane(24,10,tm('checker',6,2.5),2,5);
-plane(4,20,tm('wool:#c8323a',2,10),0,-10,.015);
-plane(56,4,tm('wool:#c8323a',28,2),0,-22,.014);
+plane(4,20,tm('wool:'+TH.carpet,2,10),0,-10,.015);
+plane(56,4,tm('wool:'+TH.carpet,28,2),0,-22,.014);
 for(let z=-19;z<0;z+=2)plane(3.2,.2,tm('wool:#f2c14e'),0,z,.02);
 for(let x=-27;x<=27;x+=2)if(Math.abs(x)>2)plane(.2,3.2,tm('wool:#f2c14e'),x,-22,.02);
 plane(6,8,tm('tile:#bfeaea',4,5),17,5,.016);
 plane(5,5,tm('plank:#b8763a',3,3),-12.5,5.5,.016);
-function tree(x,z){box(.6,1.6,.6,tm('plank:#7a5230',.5,1.3),x,.8,z);box(2.2,1.6,2.2,tm('wool:#3f9f3a',2,1.5),x,2.2,z);box(1.2,.8,1.2,tm('wool:#4fb846'),x,3.3,z)}
+function tree(x,z){
+ if(TH.id==='beach'){[0,1,2,3].forEach(k=>box(.45,.9,.45,tm('plank:#a8743f',.4,.8),x+k*.12,.45+k*.9,z));const tx=x+.4,ty=3.8;
+  [[1.6,.18,.6],[.6,.18,1.6]].forEach(([w,h,d])=>{box(w*1.6,h,d,tm('wool:#3fae5a'),tx,ty,z);box(d,h,w*1.6,tm('wool:#3fae5a'),tx,ty,z)});box(.35,.35,.35,'#7a5230',tx+.2,ty-.3,z+.1);return}
+ if(TH.id==='snow'){box(.5,1,.5,tm('plank:#6b4a2b',.4,.8),x,.5,z);[[2.4,1.1],[1.8,2],[1.1,2.8]].forEach(([w,y])=>{box(w,.8,w,tm('wool:#2f6b3a',2,1),x,y,z);box(w*.7,.16,w*.7,'#ffffff',x,y+.46,z)});return}
+ box(.6,1.6,.6,tm('plank:#7a5230',.5,1.3),x,.8,z);box(2.2,1.6,2.2,tm('wool:#3f9f3a',2,1.5),x,2.2,z);box(1.2,.8,1.2,tm('wool:#4fb846'),x,3.3,z)}
+function deco(x,z,k){
+ if(TH.id==='beach'){if(k%4===0){box(.08,1.6,.08,'#ffffff',x,.8,z).castShadow=false;const c=FL[k%5];box(1.6,.12,1.6,c,x,1.6,z);box(1.1,.1,1.1,'#ffffff',x,1.68,z)}else if(k%4===1)box(.8,.03,1.6,pick(['#ff4d4d','#5aa9e6','#ffd23f']),x,.02,z).castShadow=false;else box(.25,.15,.25,'#fff3c4',x,.07,z).castShadow=false;return}
+ if(TH.id==='snow'){if(k%6===0){box(.9,.9,.9,'#ffffff',x,.45,z);box(.65,.65,.65,'#ffffff',x,1.2,z);box(.1,.1,.3,'#ff8a3d',x,1.2,z+.4);box(.5,.12,.5,'#2b2140',x,1.6,z);box(.7,.12,.12,'#e2366b',x,.95,z+.2)}else box(.5,.25,.5,'#ffffff',x,.12,z).castShadow=false;return}
+ box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
 [[-30,14],[30,14],[-30,19],[30,19],[-18,4],[23,4],[-12,-8],[-21,-12],[-31,-26],[31,-26],[-10,-35],[10,-35],[0,-36],[-18,-2],[-14,-12],[24,-8],[31,-14],[-31,-14],[24,6]].forEach(([x,z])=>tree(x,z));
 const FL=['#ff4d4d','#ffd23f','#ffffff','#b56bff','#ff8ad8'];
 for(let k=0;k<80;k++){const x=(Math.random()-.5)*56,z=(Math.random()-.5)*66-12;
- if(x>-29&&x<29&&z>-31&&z<11)continue;if(Math.abs(x)<28&&z>9&&z<24)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
-for(let k=0;k<14;k++){const x=-(8.6+Math.random()*9),z=-1-Math.random()*12;if(Math.abs(x)>14&&z>-1)continue;box(.08,.4,.08,'#3f9f3a',x,.2,z).castShadow=false;box(.22,.22,.22,FL[k%5],x,.45,z).castShadow=false}
-const OW='brick:#d97a4a';
+ if(x>-29&&x<29&&z>-31&&z<11)continue;if(Math.abs(x)<28&&z>9&&z<24)continue;if(TH.id==='beach'&&z>23)continue;deco(x,z,k)}
+for(let k=0;k<14;k++){const x=-(8.6+Math.random()*9),z=-1-Math.random()*12;if(Math.abs(x)>14&&z>-1)continue;deco(x,z,k+1)}
+// beach: the sea beyond the road, with a line of foam; snow: falling snowflakes near the camera
+if(TH.id==='beach'){plane(240,120,mat(new THREE.MeshLambertMaterial({color:'#3fb5e8',transparent:true,opacity:.95})),0,85,.004);plane(240,1.2,mat('#e8fbff'),0,25.6,.006)}
+const snowPts=TH.id==='snow'?(()=>{const n=700,pos=new Float32Array(n*3);for(let i=0;i<n;i++){pos[i*3]=(Math.random()-.5)*60;pos[i*3+1]=Math.random()*25;pos[i*3+2]=(Math.random()-.5)*60}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,new THREE.PointsMaterial({color:'#ffffff',size:.22,transparent:true,opacity:.9}));scene.add(pts);return pts})():null;
+const OW=TH.logs?'plank:'+TH.brick:'brick:'+TH.brick;
 wall(-10.15,-.15,-1.85,.15,OW,1.8);wall(1.85,-.15,10,.15,OW,1.8);wall(12,-.15,20.15,.15,OW,1.8);
 wall(-10.15,0,-9.85,4.6,OW,1.8);wall(-10.15,6.4,-9.85,10,OW,1.8);wall(13.85,0,14.15,4.2,OW,1.8);wall(13.85,5.8,14.15,10,OW,1.8);
 // bathroom room off the right of the lobby
@@ -312,7 +346,7 @@ wall(-28.15,-24,-27.85,-20,OW,1.8);wall(27.85,-24,28.15,-20,OW,1.8);
 wall(-28,-24.15,-27.5,-23.85,OW,1.8);wall(27.5,-24.15,28,-23.85,OW,1.8);
 // supply closet
 wall(-15.15,3,-14.85,8,OW,1.8);wall(-15,2.85,-10,3.15,OW,1.8);wall(-15,7.85,-10,8.15,OW,1.8);
-const signL=label("KADEN'S KOSY HOTEL",'#4cb050',1.3);signL.position.set(0,2.5,10.4);
+const signL=label(TH.name.toUpperCase(),TH.sign,1.3);signL.position.set(0,2.5,10.4);
 const closetL=label('Supply closet','#b8763a',.9);closetL.position.set(-10,2.8,5.5);
 const rollGeo=new THREE.CylinderGeometry(.16,.16,.28,10),rollMat=mat('#ffffff');
 const sprayGeo=new THREE.BoxGeometry(.16,.3,.16),sprayMat=mat('#2ec4f1');
@@ -536,10 +570,10 @@ function liftBox(x,z){const g=new THREE.Group();scene.add(g);
  const l=label('🛗 Lift','#5d6b7a',.9);l.position.set(x,3.2,z-.7);return{g,dl,dr,x,z,open:0}}
 const lift0=liftBox(LIFT0.x,LIFT0.z),lift1=liftBox(LIFT1.x,LIFT1.z);
 // floor 2 sits on top of a tall brick tower, with the countryside far below
-box(42,14,17,tm('brick:#d97a4a',28,9),OX,-7.03,2).castShadow=false;
-plane(520,520,mat('#58a845'),OX,0,-14.5);
+box(42,14,17,tm(OW,28,9),OX,-7.03,2).castShadow=false;
+plane(520,520,mat(TH.far),OX,0,-14.5);
 for(let k=0;k<70;k++){const x=OX+(Math.random()-.5)*160,z=(Math.random()-.5)*160;if(Math.abs(x-OX)<24&&Math.abs(z-2)<12)continue;
- if(k%3)box(1.6,2,1.6,'#3f9f3a',x,-13.5,z).castShadow=false;else box(2.4,1.4,2.4,pick(['#ff8a3d','#5aa9e6','#ffd23f','#ff6b6b']),x,-13.8,z).castShadow=false}
+ if(k%3)box(1.6,2,1.6,TH.id==='snow'?'#2f6b3a':TH.id==='beach'?'#f2d38b':'#3f9f3a',x,-13.5,z).castShadow=false;else box(2.4,1.4,2.4,pick(['#ff8a3d','#5aa9e6','#ffd23f','#ff6b6b']),x,-13.8,z).castShadow=false}
 plane(40,4,tm('wool:#3a5bd9',20,2),OX,2,.015);for(let x=-19;x<=19;x+=2)if(Math.abs(x)>3)plane(.2,3.2,tm('wool:#f2c14e'),OX+x,2,.02);
 plane(6,6,tm('checker',1.5,1.5),OX,7,.016);
 wall(OX-20.15,0,OX-19.85,4,OW,1.8);wall(OX+19.85,0,OX+20.15,4,OW,1.8);wall(OX-3,9.85,OX+3,10.15,OW,1.8);
@@ -748,6 +782,19 @@ $('mlist').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)retu
  if(b.dataset.perk){const p=PERKS.find(x=>x.id===b.dataset.perk),s=perkState(p);if(s.max||s.lock||G.coins<s.cost)return;G.coins-=s.cost;p.buy();celebrate(s.name+'!')}
  save();renderMenu()};
 
+/* ---------- hotel picker ---------- */
+function renderHotels(){$('hlist').innerHTML=HOTELS.map((h,i)=>{const lv=lvOfSave(h.key),open=unlocked(h),cur=h.id===TH.id,prev=h.need&&HOTELS.find(x=>x.id===h.need);
+ const right=cur?'<span class="max">▶ Playing now</span>':open?`<button class="btn" data-h="${h.id}" style="background:linear-gradient(#6fdc78,#2f9e3c);border-color:#1f5e22">${lv?'Go there ▶':'Open it! ▶'}</button>`
+  :`<span class="lockt">🔒 Get ${prev.name.replace("Kaden's ",'')} to Level ${UNLOCK_LV} (now ${lvOfSave(prev.key)||1})</span>`;
+ return`<div class="hcard ${open?'':'lock'}" style="background:linear-gradient(#fffef9,${h.sky})"><div class="he" style="background:${h.ground}">${h.emoji}</div>
+  <div class="nm"><b>${h.name}</b><small>${h.blurb} · 💵 ×${h.mult} money${lv?` · ⭐ Level ${lv}`:''}</small></div><div class="ups">${right}</div></div>`}).join('')}
+function openHotels(){running=false;renderHotels();$('hotels').hidden=false}
+$('maps').onclick=openHotels;$('maps0').onclick=()=>{renderHotels();$('hotels').hidden=false};
+$('hclose').onclick=()=>{$('hotels').hidden=true;if(started){running=true;last=performance.now()}};
+$('hlist').onclick=e=>{const b=e.target.closest('[data-h]');if(!b)return;save();try{localStorage.setItem('kadenActive',b.dataset.h)}catch(x){}location.reload()};
+$('htitle').textContent=TH.name;$('hlogo').textContent=TH.emoji;
+const nextHotel=HOTELS[HOTELS.indexOf(TH)+1];
+
 /* ---------- goals: three little jobs at a time, each with a cash reward ---------- */
 function stat(k,n=1){G.stats[k]=(G.stats[k]||0)+n}
 const GOALT=[
@@ -763,7 +810,7 @@ const GOALT=[
  {type:'serve',icon:'🍔',text:n=>`Serve ${n} burgers`,n:[2,4,6],need:()=>G.rest},
  {type:'spray',icon:'🧴',text:n=>`Grab ${n} cleaning sprays`,n:[3,5,8]}];
 function newGoal(){const pool=GOALT.filter(t=>(!t.need||t.need())&&!G.goals.some(g=>g.type===t.type)),t=pick(pool),tier=Math.min(2,Math.floor((level()-1)/4));
- return{type:t.type,need:t.n[tier],start:G.stats[t.type]||0,reward:Math.round((40+15*level())*(1+tier*.4)/5)*5}}
+ return{type:t.type,need:t.n[tier],start:G.stats[t.type]||0,reward:Math.round((40+15*level())*(1+tier*.4)*TH.mult/5)*5}}
 function fillGoals(){while(G.goals.length<3)G.goals.push(newGoal())}
 const gProg=g=>Math.min(g.need,(G.stats[g.type]||0)-g.start);
 let goalsHTML='';
@@ -788,14 +835,14 @@ function spawn(car,foot){const vip=G.served>=5&&Math.random()<.15;
  if(car)g.m.position.set(car.space.x+car.space.sd*1.1,0,car.space.z);else if(foot)g.m.position.set(foot.x,0,foot.z);else g.m.position.set(0,0,12);g.icon=label('',undefined,.9);g.icon.visible=false;guests.push(g);Q.push(g);if(vip)say(g,'👑 VIP',3);return g}
 function say(g,t,sec=2){setLabel(g.icon,t);g.icon.visible=true;g.iconT=sec}
 const freeRoom=()=>rooms.find(r=>!r.occ&&!r.dirty&&!r.broken);
-const cashX=()=>boost.cash>0?2:1;
+const cashX=()=>(boost.cash>0?2:1)*TH.mult;
 function checkIn(){const g=Q.shift(),r=freeRoom();r.occ=g;r.occN=1;g.room=r;g.spot=0;g.state='toRoom';g.arrived=false;
  g.path=[{x:-1.2,z:DZ+1.7},{x:0,z:1},...between(LOBBY,r.p),r.p.din,LP(r.p,3,0)];
  // a family suite: the rest of the family follows the guest who checked in
  if(r.suite){const n=1+(Math.random()<.5?1:0);for(let k=1;k<=n;k++){const kid=k===n||Math.random()<.5;
   const f={m:person(pick(SHIRTS),pick(HAIR),g.m.userData.skin||pick(SKIN),pick(['#3b5bab','#2b2140','#6b4a3b'])),room:r,spot:k,state:'toRoom',t:0,path:[{x:DX+(k*.7),z:DZ+2.6},...g.path]};
   if(kid)f.m.scale.setScalar(.72);f.m.position.set(DX+k*.8,0,DZ+3.2);if(g.car){f.car=g.car;g.car.riders++}f.icon=label('',undefined,.9);f.icon.visible=false;guests.push(f);r.occN++}}
- const pay=(Math.round([22,32,45][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?6:0))*(g.vip?3:1)*cashX();
+ const pay=Math.round((Math.round([22,32,45][G.beds]*TIERX[tierOf(r)]*(r.suite?2.5:1))+(G.fountain?6:0))*(g.vip?3:1)*cashX());
  fly(billGeo,billMat,g.m.position.clone().setY(1.2),()=>W3(PX,.6,PZ),.5,()=>{G.pile+=pay;drawPile();sfx.cash()});
  stat('checkin');if(g.vip)stat('vip');sfx.ding();stars(DX,1.6,DZ,g.vip?14:5,2.5);fxAt(DX,2,DZ,(g.vip?'👑 ':'')+'+$'+pay);
  Q.forEach((q,i)=>{q.path=[slot(i)];q.arrived=false});save()}
@@ -824,7 +871,7 @@ function finishEat(g){const t=g.table,pay=Math.round((22+10*G.food)*(g.vip?2:1)*
  t.plate.visible=false;t.state='free';t.guest=null;t.claim=null;g.sit=false;g.m.position.y=0;g.table=null;
  afterVisit(g,[{x:t.seat.x,z:-1.4},RIN,RDOOR],LOBBY)}
 function finishLoo(g){const t=g.toilet;t.occ=null;
- if(t.paper>0){t.paper--;const tip=(G.goldLoo?10:5)*cashX()*(g.vip?2:1);G.pile+=tip;drawPile();say(g,'😊 +$'+tip)}else{say(g,'😠 No paper!',2.5);sfx.sad()}
+ if(t.paper>0){t.paper--;const tip=Math.round((G.goldLoo?10:5)*cashX()*(g.vip?2:1));G.pile+=tip;drawPile();say(g,'😊 +$'+tip)}else{say(g,'😠 No paper!',2.5);sfx.sad()}
  if(level()>=3&&Math.random()<.04)breakIt(t);
  const b=t.bath;g.state='exit';g.path=b.lobby?[t.front,b.zone,BDOOR,{x:1.4,z:8.6},...exitTail(g)]:[t.front,b.p.din,b.p.cp,...between(b.p,LOBBY),{x:1.4,z:8.6},...exitTail(g)]}
 /* ---------- maintenance: blocked toilets, broken TVs, jammed snack machines ---------- */
@@ -837,9 +884,9 @@ function issues(){const a=[];
 const fixRoute=(i,from)=>i.p?[...from,{x:0,z:1},...between(LOBBY,i.p),i.p.din,i.spot]:[...from,BDOOR,LB.zone,i.spot];
 const fixBack=(i,home)=>i.p?[i.p.din,i.p.cp,...between(i.p,LOBBY),home]:[LB.zone,BDOOR,home];
 let lvT=null;
-function levelUp(){const L=level(),bonus=30*L;sfx.level();G.pile+=bonus;drawPile();stars(player.position.x,1.5,player.position.z,40,5);
+function levelUp(){const L=level(),bonus=Math.round(30*L*TH.mult);sfx.level();G.pile+=bonus;drawPile();stars(player.position.x,1.5,player.position.z,40,5);
  const nw=[...STAFF.filter(e=>e.d.lv===L&&!e.d.free).map(e=>e.d.n),...(PLV.includes(L)?['🛏️']:[])].slice(0,4).join(', ');
- $('lvn').textContent=`LEVEL ${L}!`;$('lvnew').textContent=`+$${bonus} bonus`+(nw?`  ·  New: ${nw}`:'');
+ $('lvn').textContent=`LEVEL ${L}!`;const newH=L===UNLOCK_LV&&nextHotel?`  ·  🗺️ ${nextHotel.name} is open!`:'';$('lvnew').textContent=`+$${bonus} bonus`+(nw?`  ·  New: ${nw}`:'')+newH;
  const o=$('lvup');o.hidden=false;o.querySelector('.lt').style.animation='none';void o.offsetWidth;o.querySelector('.lt').style.animation='';
  clearTimeout(lvT);lvT=setTimeout(()=>o.hidden=true,2600);
  for(let k=0;k<26;k++){const c=document.createElement('div');c.className='conf';c.textContent=pick(['★','★','✦','💵','⭐']);
@@ -963,7 +1010,7 @@ function step(dt){
   fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}};
  grab(()=>G.pile,v=>G.pile=v,PX,PZ,drawPile);
  tables.forEach(t=>{if(tableOpen(t))grab(()=>G.tp[t.i]||0,v=>G.tp[t.i]=v,t.x,t.z,()=>drawTable(t))});
- snacks.forEach(s=>{s.t+=dt;if(s.t>3){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=(4+2*G.snackUp)*cashX();drawSnack(s)}}
+ snacks.forEach(s=>{s.t+=dt;if(s.t>3){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=Math.round((4+2*G.snackUp)*cashX());drawSnack(s)}}
   grab(()=>G.sp[s.i],v=>G.sp[s.i]=v,s.px,s.pz,()=>drawSnack(s))});
 
  rollT+=dt;
@@ -1073,6 +1120,7 @@ function step(dt){
  else if(plotReady){const pp=LP(pl,-1,0);setHint(`You can build ${NAME[pl.type]}! Stand on the green square and tap Buy`,pp.x,pp.z)}
  else if(pad)setHint(`You can buy: ${pad.name}! Stand on the green square and tap Buy`,pad.x,pad.z);
  else if(G.floors<2&&level()>=7&&G.coins>=500)setHint('You can open Floor 2! Stand in the 🛗 lift and tap Buy',LIFT0.x,LIFT0.z);
+ else if(nextHotel&&level()>=UNLOCK_LV&&!lvOfSave(nextHotel.key))setHint(`A new hotel is open! Tap 🗺️ Hotels to visit ${nextHotel.name}`);
  else if(menuDot)setHint('Open 🏨 Manager to hire staff and buy upgrades!');
  else if(level()>=3&&rooms.some(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1])){const r=rooms.find(r=>tierOf(r)<4&&G.coins>=TIERC[tierOf(r)+1]);setHint('Make a room fancier so guests pay more! ⬆️',r.px,r.pz)}
  else if(snacks.some(s=>G.sp[s.i]>=20)){const s=snacks.find(s=>G.sp[s.i]>=20);setHint('The snack bar made cash! 🥤',s.px,s.pz)}
@@ -1090,6 +1138,7 @@ function step(dt){
   const hb=document.querySelector('.hud').getBoundingClientRect().bottom;put('goals',Math.round(hb+8)+'px','top')}
  // far-away labels fade out so the screen stays tidy
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
+ if(snowPts){const a=snowPts.geometry.attributes.position;for(let i=0;i<a.count;i++){let y=a.getY(i)-dt*(2+i%3);if(y<0)y+=25;a.setY(i,y);a.setX(i,a.getX(i)+Math.sin(now/900+i)*dt*.3)}a.needsUpdate=true;snowPts.position.set(cam.position.x,0,cam.position.z-12)}
  saveT+=dt;if(saveT>3){saveT=0;save()}
  hud(dt)}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(running)step(dt);renderer.render(scene,cam);requestAnimationFrame(frame)}
