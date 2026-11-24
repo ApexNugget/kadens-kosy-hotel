@@ -128,6 +128,8 @@ const KEY='kadenBarber1',PKEY='kadenBarberPhotos';
 const s=.25,HT=6.4,HB=4.4;// one hair block, top and bottom of the head
 let G={cur:'kaden',chars:{},mute:false};
 try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v)G=Object.assign(G,v)}catch(e){}
+// v2: thicker hair has more blocks, so older saved haircuts no longer fit and start fresh
+if(G.v!==2){G.v=2;G.chars={}}
 let photos=[];try{photos=JSON.parse(localStorage.getItem(PKEY)||'[]')}catch(e){}
 let saveTm=null;const save=()=>{clearTimeout(saveTm);saveTm=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}},400)};
 function pick(a){return a[Math.random()*a.length|0]}
@@ -264,9 +266,12 @@ const charG=new THREE.Group();chairG.add(charG);
    beard strands hang down from the chin */
 const RING=[];for(let i=-1;i<=8;i++)for(let j=-1;j<=8;j++)if(i<0||i>7||j<0||j>7)RING.push([i,j]);
 const STR=[];
-for(let i=0;i<8;i++)for(let j=0;j<8;j++)STR.push({t:'top',sd:'top',x:-1+s*(i+.5),z:-1+s*(j+.5),max:10});
+for(let i=0;i<8;i++)for(let j=0;j<8;j++)STR.push({t:'top',sd:'top',i,j,x:-1+s*(i+.5),z:-1+s*(j+.5),max:12});
 RING.forEach(([i,j])=>STR.push({t:'ring',sd:j===8&&i>=0&&i<=7?'front':j===-1?'back':'side',i,x:-1+s*(i+.5),z:-1+s*(j+.5),max:24}));
-for(let i=0;i<8;i++)STR.push({t:'beard',sd:'beard',i,x:-1+s*(i+.5),z:1.3,max:12});
+// a second, outer layer of hair so it can be big and thick
+const RING2=[];for(let i=-2;i<=9;i++)for(let j=-2;j<=9;j++)if(i<-1||i>8||j<-1||j>8)RING2.push([i,j]);
+RING2.forEach(([i,j])=>STR.push({t:'ring',sd:j===9&&i>=-1&&i<=8?'front2':j===-2?'back2':'side2',i,x:-1+s*(i+.5),z:-1+s*(j+.5),max:24}));
+for(let i=0;i<8;i++)STR.push({t:'beard',sd:'beard',i,x:-1+s*(i+.5),z:1.55,max:12});
 STR.forEach((t,n)=>t.n=n);
 const vy=(t,k)=>t.t==='top'?HT+s*(k+.5):t.t==='ring'?HT-s*(k+.5):HB+.375-s*k;
 const MAXV=STR.reduce((a,t)=>a+t.max,0);
@@ -277,13 +282,16 @@ const hash=n=>{const x=Math.sin(n*127.1)*43758.5;return x-Math.floor(x)};
 
 /* ---------- the six people ---------- */
 const PEOPLE=[
- {id:'kaden',n:'Kaden',skin:'#e0a878',hc:'#5a3a22',eye:'#3b2a8a',shirt:'#2ec4f1',pants:'#3b5bab',hair:{top:2,side:3,back:4,front:t=>t.i<5?2:1}},
- {id:'shauna',n:'Shauna',skin:'#f6d2b8',hc:'#c1440e',eye:'#2e7d32',shirt:'#1d1d1d',pants:'#1d1d1d',apron:1,hair:{top:1,side:16,back:18,front:t=>t.i<=1||t.i>=6?14:2}},
- {id:'jay',n:'Jay',skin:'#e0a878',hc:'#5a3a22',eye:'#3b2a8a',shirt:'#e94b3c',pants:'#2f5fa7',overalls:'#2f5fa7',hair:{top:t=>t.z>.5?3:2,side:2,back:3,front:1}},
- {id:'mace',n:'Mace Man',skin:'#e0a878',hc:'#6b3e1f',eye:'#3b2a8a',shirt:'#f2f2f2',pants:'#5d6b7a',overalls:'#5d6b7a',tash:1,hair:{top:1,side:3,back:14,front:1}},
- {id:'eala',n:'Éala',skin:'#f2c39b',hc:'#3b2a1a',eye:'#5a3a22',shirt:'#ffffff',pants:'#7b2cbf',overalls:'#7b2cbf',hair:{top:1,side:13,back:15,front:3}},
- {id:'fluffy',n:'Fluffy the Yeti',skin:'#9bd4ff',hc:'#f4f4f4',eye:'#2b2140',shirt:'#f4f4f4',pants:'#f4f4f4',fur:1,hair:{top:3,side:9,back:9,front:t=>t.i<2||t.i>5?6:1,beard:t=>t.i>0&&t.i<7?2:0}}];
-function defHair(P){return{len:STR.map(t=>{const f=P.hair[t.sd];return Math.min(t.max,typeof f==='function'?f(t):f||0)}),col:{},hat:'none',glasses:0}}
+ {id:'kaden',n:'Kaden',skin:'#e0a878',hc:'#5a3a22',eye:'#3b2a8a',shirt:'#2ec4f1',pants:'#3b5bab',hair:{top:5,side:7,back:9,front:t=>t.i<5?3:2,side2:6,back2:8}},
+ {id:'shauna',n:'Shauna',skin:'#f6d2b8',hc:'#c1440e',eye:'#2e7d32',shirt:'#1d1d1d',pants:'#1d1d1d',apron:1,hair:{top:3,side:20,back:22,front:t=>t.i<=1||t.i>=6?18:3,side2:18,back2:21,front2:t=>t.i<=1||t.i>=6?15:0}},
+ {id:'jay',n:'Jay',skin:'#e0a878',hc:'#5a3a22',eye:'#3b2a8a',shirt:'#e94b3c',pants:'#2f5fa7',overalls:'#2f5fa7',hair:{top:t=>t.z>.3?7:5,side:5,back:6,front:2,side2:4,back2:5}},
+ {id:'mace',n:'Mace Man',skin:'#e0a878',hc:'#6b3e1f',eye:'#3b2a8a',shirt:'#f2f2f2',pants:'#5d6b7a',overalls:'#5d6b7a',tash:1,hair:{top:3,side:5,back:20,front:2,side2:4,back2:19}},
+ {id:'eala',n:'Éala',skin:'#f2c39b',hc:'#3b2a1a',eye:'#5a3a22',shirt:'#ffffff',pants:'#7b2cbf',overalls:'#7b2cbf',hair:{top:3,side:18,back:20,front:3,side2:16,back2:19,front2:t=>t.i<=1||t.i>=6?12:0}},
+ {id:'fluffy',n:'Fluffy the Yeti',skin:'#9bd4ff',hc:'#f4f4f4',eye:'#2b2140',shirt:'#f4f4f4',pants:'#f4f4f4',fur:1,hair:{top:6,side:12,back:13,front:t=>t.i<2||t.i>5?9:1,side2:11,back2:12,front2:t=>t.i<=1||t.i>=6?8:0,beard:t=>t.i>0&&t.i<7?5:0}}];
+function defHair(P){return{len:STR.map(t=>{const f=P.hair[t.sd];let v=typeof f==='function'?f(t):f||0;
+  // round the top into a dome: a bit shorter towards the edges
+  if(t.t==='top'&&v>=3){const d=Math.min(t.i,7-t.i,t.j,7-t.j);v=Math.max(2,v-[2,1,0,0][Math.min(d,3)])}
+  return Math.min(t.max,v)}),col:{},hat:'none',glasses:0}}
 let P=PEOPLE[0],st=null,bodyG=null,head=null,eyes=null,mouthS=null,mouthO=null;
 function buildBody(){if(bodyG)charG.remove(bodyG);bodyG=new THREE.Group();charG.add(bodyG);const g=bodyG,sk=P.skin;
  head=box(2,2,2,sk,0,5.4,0,g);
