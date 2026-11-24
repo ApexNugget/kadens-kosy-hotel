@@ -5,6 +5,7 @@ Blocky, ad-free games for the browser. The home page lets you pick one:
 - **Kaden's Kosy Hotel** (`hotel.html`): check guests in, clean rooms, refill the toilets, build out the hotel, then open the Beach Hotel and Snow Lodge.
 - **Kaden Mart** (`mart.html`): serve customers at the tills, fill the shelves from the stockroom, push trolleys back from the car park and grow the supermarket.
 - **Kaden's Kutz** (`barber.html`): a blocky barber shop. Snip, buzz, grow and paint six people's hair, add hats and take photos.
+- **Kaden's Kool Kones** (`icecream.html`): drive an ice cream van to the park, beach, football pitch, funfair and snowy hill, and copy the picture orders to serve the queue.
 
 Play: https://apexnugget.github.io/kadens-kosy-hotel/
 

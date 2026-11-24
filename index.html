@@ -29,7 +29,7 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
  text-shadow:4px 0 0 var(--ink),-4px 0 0 var(--ink),0 4px 0 var(--ink),0 -4px 0 var(--ink),4px 4px 0 var(--ink),-4px -4px 0 var(--ink),4px -4px 0 var(--ink),-4px 4px 0 var(--ink),0 10px 0 var(--ink);animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-1deg)}}
 .sub{position:relative;z-index:1;margin:6px 0 22px;font-size:clamp(18px,3vw,24px);color:#fff;text-shadow:2px 0 0 #2b6fc2,-2px 0 0 #2b6fc2,0 2px 0 #2b6fc2,0 -2px 0 #2b6fc2,0 4px 0 #2b6fc2}
-.games{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:20px;width:min(1080px,100%)}
+.games{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:18px;width:min(1180px,100%)}
 .game{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#2b2140;border:5px solid var(--ink);border-radius:30px;padding:20px 18px 18px;
  box-shadow:0 10px 0 var(--ink),0 16px 28px #0003;transition:transform .12s;touch-action:manipulation;position:relative;overflow:hidden}
 .game:active{transform:translateY(8px);box-shadow:0 2px 0 var(--ink)}
@@ -37,8 +37,9 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
 .hotel{background:linear-gradient(#9be7a3,#4cb050)}
 .mart{background:linear-gradient(#ffb3ab,#ff5a4e)}
 .barber{background:linear-gradient(#f7c6ff,#b56bff)}
+.ice{background:linear-gradient(#bff0ff,#2ec4f1)}
 .pic{font-size:clamp(80px,14vw,120px);line-height:1;filter:drop-shadow(0 6px 0 #0003);animation:wig 3s ease-in-out infinite}
-.mart .pic{animation-delay:-1.5s}.barber .pic{animation-delay:-.7s}
+.mart .pic{animation-delay:-1.5s}.barber .pic{animation-delay:-.7s}.ice .pic{animation-delay:-2.2s}
 @keyframes wig{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg) scale(1.05)}}
 .name{margin-top:10px;font-size:clamp(28px,4.6vw,40px);font-weight:700;color:#fff;text-align:center;line-height:1.05;
  text-shadow:3px 0 0 var(--ink),-3px 0 0 var(--ink),0 3px 0 var(--ink),0 -3px 0 var(--ink),3px 3px 0 var(--ink),-3px -3px 0 var(--ink),3px -3px 0 var(--ink),-3px 3px 0 var(--ink),0 6px 0 var(--ink)}
@@ -74,12 +75,20 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
   <div class="lv" id="blv">💈 6 people</div>
   <div class="play">Play ▶</div>
  </a>
+ <a class="game ice" href="icecream.html">
+  <div class="pic">🍦</div>
+  <div class="name">Kaden's Kool Kones</div>
+  <div class="what">Drive the ice cream van and scoop for the queue</div>
+  <div class="lv" id="ilv">⭐ New game</div>
+  <div class="play">Play ▶</div>
+ </a>
 </div>
 <script>
 {
 const LV=[0,3,8,15,24,35,50,70,95,125,160,200,250,310,380,460,550,650,760,880];
 const lv=k=>{try{const s=JSON.parse(localStorage.getItem(k)||'null');return s?LV.filter(t=>(s.served||0)>=t).length:0}catch(e){return 0}};
-const h=Math.max(lv('kadenHotel2'),lv('kadenHotel2_beach'),lv('kadenHotel2_snow')),m=lv('kadenMart1');
+const h=Math.max(lv('kadenHotel2'),lv('kadenHotel2_beach'),lv('kadenHotel2_snow')),m=lv('kadenMart1'),ic=lv('kadenIce1');
+if(ic)document.getElementById('ilv').textContent=`⭐ Level ${ic}`;
 const hotels=[lv('kadenHotel2_beach')?1:0,lv('kadenHotel2_snow')?1:0].reduce((a,b)=>a+b,1);
 if(h)document.getElementById('hlv').textContent=`⭐ Level ${h}`+(hotels>1?` · ${hotels} hotels`:'');
 if(m)document.getElementById('mlv').textContent=`⭐ Level ${m}`;
