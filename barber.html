@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Built from src/barber.html by build.py: edit the source, not this file. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -123,8 +124,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#9bd4ff;font:600 17px/
 <script src="three.min.js"></script>
 <script>
 {
+/* engine: keep saves safe and let the games work offline */
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>p||navigator.storage.persist()).catch(()=>{})}catch(e){}
+try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!/claude|anthropic/.test(location.hostname))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 const $=id=>document.getElementById(id);
 const KEY='kadenBarber1',PKEY='kadenBarberPhotos';
+const ENV={ground:'#5dbb46',groundNoise:.14,check:'#ffb3ab'};
 const s=.25,HT=6.4,HB=4.4;// one hair block, top and bottom of the head
 let G={cur:'kaden',chars:{},mute:false};
 try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v)G=Object.assign(G,v)}catch(e){}
@@ -136,6 +141,7 @@ function pick(a){return a[Math.random()*a.length|0]}
 const rnd=(a,b)=>a+Math.random()*(b-a);
 
 /* ---------- sound ---------- */
+/* engine: tiny Web Audio beeps and jingles (respects G.mute) */
 let ac=null;
 function tone(f,d=.12,type='sine',when=0,vol=.14){if(G.mute)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
  const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+when;o.type=type;o.frequency.setValueAtTime(f,t);
@@ -163,6 +169,7 @@ const cam=new THREE.PerspectiveCamera(36,1,.1,100);
 scene.add(new THREE.HemisphereLight(0xffffff,0x9a8a70,.8));
 const sun=new THREE.DirectionalLight(0xfff4e0,.75);sun.position.set(4,12,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
 Object.assign(sun.shadow.camera,{left:-7,right:7,top:10,bottom:-2,far:40});sun.shadow.bias=-.0008;scene.add(sun);
+/* engine: pixel-art canvas textures and the shared material cache (needs ENV) */
 function shade(hex,a){const n=parseInt(hex.slice(1),16);const f=v=>Math.max(0,Math.min(255,Math.round(v+a*255)));
  return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
 function pix(base,vary,draw,w=16,h=16,edge){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
@@ -175,8 +182,8 @@ const bricks=c=>x=>{x.fillStyle=c;for(let y=3;y<16;y+=4){x.fillRect(0,y,16,1);co
 const tiles=c=>x=>{x.fillStyle=c;x.fillRect(0,7,16,1);x.fillRect(7,0,1,16);x.fillRect(0,15,16,1);x.fillRect(15,0,1,16)};
 const BASE={};
 function tex(key){if(BASE[key])return BASE[key];let t;
- if(key==='grass')t=pix('#5dbb46',.14);
- else if(key==='checker')t=pix('#f4f1e8',.05,x=>{for(let i=0;i<16;i++)for(let j=0;j<16;j++)if(((i>>3)+(j>>3))%2){x.fillStyle=shade('#ffb3ab',(Math.random()-.5)*.06);x.fillRect(i,j,1,1)}});
+ if(key==='grass')t=pix(ENV.ground,ENV.groundNoise);
+ else if(key==='checker')t=pix('#f4f1e8',.05,x=>{for(let i=0;i<16;i++)for(let j=0;j<16;j++)if(((i>>3)+(j>>3))%2){x.fillStyle=shade(ENV.check,(Math.random()-.5)*.06);x.fillRect(i,j,1,1)}});
  else if(key==='gravel')t=pix('#a89f91',.25);
  else if(key.startsWith('plank:')){const c=key.slice(6);t=pix(c,.08,planks(shade(c,-.14)),16,16,1)}
  else if(key.startsWith('brick:')){const c=key.slice(6);t=pix(c,.08,bricks(shade(c,-.16)),16,16,1)}
@@ -195,6 +202,7 @@ const GC={};const geo=(w,h,d)=>{const k=w+','+h+','+d;return GC[k]||(GC[k]=new T
 const box=(w,h,d,c,x,y,z,p)=>add(new THREE.Mesh(geo(w,h,d),mat(c)),p,x,y,z);
 const cylm=(r,h,c,x,y,z,p)=>add(new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,16),mat(c)),p,x,y,z);
 function plane(w,d,m,x,z,y=.01){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,d),mat(m));p.rotation.x=-Math.PI/2;p.position.set(x,y,z);p.receiveShadow=true;scene.add(p);return p}
+/* engine: speech-bubble labels, the progress ring and sparkle stars */
 function rr(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()}
 const LIGHT=['#fffaf0','#ffd23f','#dddddd'];
 const LABELS=new Set();
@@ -457,6 +465,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
 for(let k=0;k<14;k++){const t=document.createElement('div');t.style.cssText=`position:absolute;left:${Math.random()*96}vw;top:${Math.random()*92}vh;color:#ffd23f;font-size:${12+Math.random()*22}px;pointer-events:none;text-shadow:0 0 10px #ffd23f;animation:pop 2s ease-in-out ${Math.random()*2}s infinite alternate`;t.textContent='★';$('start').appendChild(t)}
 P=PEOPLE.find(p=>p.id===G.cur)||PEOPLE[0];st=G.chars[P.id]||defHair(P);buildBody();buildHat();rebuild();chairG.rotation.y=-.5;rotT=-.5;
 resize();
+/* engine: re-draw labels once the Fredoka font has loaded */
 if(document.fonts)document.fonts.ready.then(()=>LABELS.forEach(l=>{const u=l.userData,t=u.txt;u.txt=null;setLabel(l,t,u.cur)}));
 requestAnimationFrame(frame);
 window.addEventListener('pagehide',()=>{try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}});
