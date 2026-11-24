@@ -20,9 +20,11 @@
    COLOUR/TYPE: grass green, wool colours, cash green; Fredoka for big readable labels
    LAYOUT: full-screen stage, pills top-left, hint top-centre, joystick where the finger lands, picture-maths card for power-ups */
 @@hud@@
+@@loader@@
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">🏨</span>Kaden's Kosy Hotel<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <div id="stage"></div>
 <div class="hud">
  <span class="pill" id="cash">$0</span>
@@ -31,10 +33,14 @@
  <span class="pill" id="park">🚗 0/6</span>
  <span class="pill" id="lvl"><em>⭐</em> <span id="lvt">Level 1</span><i><b id="lvlbar"></b></i></span>
  <span id="boosts"></span>
- <div id="hint">Walk around with your finger 👆</div>
+ <span class="grow"></span>
  <button class="btn mgr" id="mgr">🏨 Manager<i id="dot" hidden>!</i></button>
+ <button class="btn small" id="more" aria-label="More buttons">☰</button>
+</div>
+<div id="hint">Walk around with your finger 👆</div>
+<div id="morep" hidden>
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
- <a class="btn small" id="home" href="index.html" style="text-decoration:none;display:inline-grid;place-items:center">🏠 Home</a>
+ <a class="btn small" id="home" href="index.html">🏠 Home</a>
  <button class="btn small" id="maps">🗺️ Hotels</button>
  <button class="btn small" id="reset">Start over</button>
 </div>
@@ -599,7 +605,7 @@ function renderGoals(){const h=G.goals.map((g,i)=>{const t=GOALT.find(x=>x.type=
 $('glist').onclick=e=>{const el=e.target.closest('[data-g]');if(!el)return;const i=+el.dataset.g,g=G.goals[i];if(!g||gProg(g)<g.need)return;
  G.coins+=g.reward;bump=1;stars(player.position.x,1.5,player.position.z,30,4.5);celebrate(`Goal done! +$${g.reward}`);G.goals.splice(i,1);G.goals.push(newGoal());save();renderGoals()};
 $('gh').onclick=()=>{G.gmin=!G.gmin;$('goals').classList.toggle('min',G.gmin);save()};
-fillGoals();if(G.gmin||innerWidth<600)$('goals').classList.add('min');
+fillGoals();if(G.gmin||innerWidth<600||innerHeight<500)$('goals').classList.add('min');
 
 /* ---------- guests ---------- */
 const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd23f','#ff4d4d','#8d6e63'];
@@ -735,10 +741,11 @@ function stepChef(c,dt,now){const u=c.m.userData,busy=food<8;u.armL.rotation.x=b
 let liftLock=false,liftT=0,camSnap=false;
 let last=performance.now(),saveT=0,running=false,started=false,hintTxt='',pileT=0,rollT=0,warnT=0,dotT=0,menuDot=false;
 @@put@@
+@@layout@@
 let shownCash=0,bumpT=0;
 function hud(dt=1){const before=Math.round(shownCash);shownCash+=(G.coins-shownCash)*Math.min(1,dt*9);if(Math.abs(G.coins-shownCash)<.5)shownCash=G.coins;
  const sc=Math.round(shownCash);put('cash','$'+sc);bumpT-=dt;if(sc>before&&bumpT<=0){bumpT=.25;const c=$('cash');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
- put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇':'🔊');
+ put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇 Sound off':'🔊 Sound on');
  const L=level(),a=LEVELS[L-1],b=LEVELS[L];put('lvt','Level '+L);put('lvlbar',(b?(G.served-a)/(b-a)*100:100)+'%','width');
  put('boosts',(boost.speed>0?`<span class="pill">🛴 ${Math.ceil(boost.speed)}s</span>`:'')+(boost.cash>0?`<span class="pill">💵×2 ${Math.ceil(boost.cash)}s</span>`:'')+(boost.magnet>0?`<span class="pill">🧲 ${Math.ceil(boost.magnet)}s</span>`:''),'innerHTML')}
 function setHint(t,x,z){if(x!==undefined&&floorOf(x)!==floorOf(player.position.x)){const L=floorOf(player.position.x)?LIFT1:LIFT0;x=L.x;z=L.z;t+=' (take the 🛗 lift)'}if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
@@ -894,7 +901,7 @@ function step(dt){
  sun.position.set(cam.position.x-10,30,cam.position.z+2);sun.target.position.set(cam.position.x,0,cam.position.z-oz);
  if(G.fountain){fw.scale.setScalar(1+Math.sin(now/300)*.03);fw2.position.y=1.5+Math.sin(now/200)*.03;if(Math.random()<dt*1.5)stars(FX,1.7,FZ,1,1.6)}
  dotT-=dt;if(dotT<=0){dotT=.4;menuDot=anyBuyable();put('dot',!menuDot,'hidden');renderGoals();
-  const hb=document.querySelector('.hud').getBoundingClientRect().bottom;put('goals',Math.round(hb+8)+'px','top')}
+  layoutHud()}
  // far-away labels fade out so the screen stays tidy
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  if(snowPts){const a=snowPts.geometry.attributes.position;for(let i=0;i<a.count;i++){let y=a.getY(i)-dt*(2+i%3);if(y<0)y+=25;a.setY(i,y);a.setX(i,a.getX(i)+Math.sin(now/900+i)*dt*.3)}a.needsUpdate=true;snowPts.position.set(cam.position.x,0,cam.position.z-12)}
@@ -911,6 +918,7 @@ let armed=false;$('reset').onclick=()=>{if(!armed){armed=true;$('reset').textCon
  running=false;G=JSON.parse(JSON.stringify(DEF));save();location.reload()};
 @@fonts@@
 requestAnimationFrame(frame);
+@@smooth@@
 }
 </script>
 </body>

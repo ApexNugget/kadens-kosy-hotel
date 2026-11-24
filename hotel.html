@@ -40,7 +40,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 #boosts{display:flex;gap:6px}
 #boosts span{background:linear-gradient(#ffe680,#ffc21a);border-color:#8a6a00;animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.06)}}
-#hint{flex:1 1 240px;text-align:center;background:linear-gradient(#fffef9f2,#f6edd8f2);border-radius:14px;padding:8px 14px;font-size:19px;font-weight:600;box-shadow:inset 0 2px 0 #fff,0 4px 0 #0005;max-width:520px;margin:0 auto;border:3px solid #3b2a1a}
+#hint{position:fixed;z-index:4;left:10px;right:10px;top:70px;width:fit-content;max-width:min(520px,calc(100vw - 20px));margin:0 auto;pointer-events:none;text-align:center;background:linear-gradient(#fffef9f2,#f6edd8f2);border-radius:14px;padding:8px 14px;font-size:19px;font-weight:600;box-shadow:inset 0 2px 0 #fff,0 4px 0 #0005;max-width:520px;margin:0 auto;border:3px solid #3b2a1a}
 #hint.new{animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
 @keyframes pop{from{transform:scale(.85);opacity:.4}}
 .btn{touch-action:manipulation;pointer-events:auto;background:linear-gradient(#f2557f,#c9244f);color:#fff;text-shadow:0 2px 0 #0004;border:3px solid #7a1236;border-radius:14px;padding:6px 12px;font:inherit;font-size:20px;box-shadow:0 4px 0 #0004;min-height:46px;min-width:46px;cursor:pointer}
@@ -116,11 +116,31 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 @keyframes fall{to{transform:translateY(115vh) rotate(720deg)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-@media(max-width:600px){#hint{font-size:16px;order:5;flex-basis:100%}.pill{font-size:16px;padding:5px 8px}}
+@media(max-width:600px){#hint{font-size:16px}.pill{font-size:16px;padding:5px 8px}}
+.hud .grow{flex:1 1 0}
+#more{min-width:46px;font-size:22px;padding:4px 10px}
+#morep{position:fixed;right:10px;top:70px;z-index:8;display:grid;gap:8px;background:linear-gradient(#fffef9,#f6ecd4);border:3px solid #3b2a1a;border-radius:18px;padding:10px;box-shadow:0 6px 0 #0004;animation:pop .25s cubic-bezier(.2,1.6,.4,1)}
+#morep .btn{font-size:18px;min-height:48px;justify-content:center;text-decoration:none;display:flex;align-items:center;gap:6px}
+#morep #snd{background:linear-gradient(#fffef9,#efe3c6);color:#2b2140;border-color:#3b2a1a;text-shadow:none}
+/* short screens (a phone on its side): smaller hint and a start card that always shows Play */
+@media(max-height:500px){#hint{font-size:15px;padding:5px 10px}.pill{font-size:15px;padding:4px 8px}
+ .card{padding:12px 16px;max-height:calc(100vh - 16px);overflow:auto}.logo{display:none}.card h1{font-size:32px;margin-bottom:4px}.card p{font-size:14px;margin:3px 0}#start .btn.go{margin-top:2px}}
 @media(prefers-reduced-motion:reduce){.fx{animation:none;opacity:0}}
+/* engine: loading screen and the soft fade between pages */
+#loader{position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#d6f2ff,#6ec6ff);transition:opacity .45s ease}
+#loader.gone{opacity:0;pointer-events:none}
+#loader .ld{display:flex;flex-direction:column;align-items:center;gap:6px;font:700 26px Fredoka,"Arial Rounded MT Bold",system-ui,sans-serif;color:#2b2140;text-align:center;padding:0 20px}
+#loader .le{font-size:84px;line-height:1.1;animation:ldb .7s ease-in-out infinite alternate}
+@keyframes ldb{to{transform:translateY(-16px) rotate(6deg)}}
+#loader i{font-style:normal;font-size:18px;opacity:.75}#loader i span{animation:ldd 1.2s infinite}#loader i span:nth-child(2){animation-delay:.2s}#loader i span:nth-child(3){animation-delay:.4s}
+@keyframes ldd{50%{opacity:.1}}
+html.leaving body::after{content:"";position:fixed;inset:0;z-index:100;background:#bfe9ff;animation:kgleave .26s ease-in forwards}
+@keyframes kgleave{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#loader .le,#loader i span{animation:none}}
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">🏨</span>Kaden's Kosy Hotel<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <div id="stage"></div>
 <div class="hud">
  <span class="pill" id="cash">$0</span>
@@ -129,10 +149,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
  <span class="pill" id="park">🚗 0/6</span>
  <span class="pill" id="lvl"><em>⭐</em> <span id="lvt">Level 1</span><i><b id="lvlbar"></b></i></span>
  <span id="boosts"></span>
- <div id="hint">Walk around with your finger 👆</div>
+ <span class="grow"></span>
  <button class="btn mgr" id="mgr">🏨 Manager<i id="dot" hidden>!</i></button>
+ <button class="btn small" id="more" aria-label="More buttons">☰</button>
+</div>
+<div id="hint">Walk around with your finger 👆</div>
+<div id="morep" hidden>
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
- <a class="btn small" id="home" href="index.html" style="text-decoration:none;display:inline-grid;place-items:center">🏠 Home</a>
+ <a class="btn small" id="home" href="index.html">🏠 Home</a>
  <button class="btn small" id="maps">🗺️ Hotels</button>
  <button class="btn small" id="reset">Start over</button>
 </div>
@@ -842,7 +866,7 @@ function renderGoals(){const h=G.goals.map((g,i)=>{const t=GOALT.find(x=>x.type=
 $('glist').onclick=e=>{const el=e.target.closest('[data-g]');if(!el)return;const i=+el.dataset.g,g=G.goals[i];if(!g||gProg(g)<g.need)return;
  G.coins+=g.reward;bump=1;stars(player.position.x,1.5,player.position.z,30,4.5);celebrate(`Goal done! +$${g.reward}`);G.goals.splice(i,1);G.goals.push(newGoal());save();renderGoals()};
 $('gh').onclick=()=>{G.gmin=!G.gmin;$('goals').classList.toggle('min',G.gmin);save()};
-fillGoals();if(G.gmin||innerWidth<600)$('goals').classList.add('min');
+fillGoals();if(G.gmin||innerWidth<600||innerHeight<500)$('goals').classList.add('min');
 
 /* ---------- guests ---------- */
 const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd23f','#ff4d4d','#8d6e63'];
@@ -991,10 +1015,21 @@ let liftLock=false,liftT=0,camSnap=false;
 let last=performance.now(),saveT=0,running=false,started=false,hintTxt='',pileT=0,rollT=0,warnT=0,dotT=0,menuDot=false;
 /* engine: only touch the DOM when a value changes */
 const HC={};function put(id,v,prop='textContent'){if(HC[id+prop]===v)return false;HC[id+prop]=v;if(prop==='width'||prop==='top')$(id).style[prop]=v;else $(id)[prop]=v;return true}
+/* engine: keep the hint, goals and the ☰ panel tidy under the top bar */
+function layoutHud(){const hb=Math.round(document.querySelector('.hud').getBoundingClientRect().bottom),g=document.getElementById('goals'),h=document.getElementById('hint'),mp=document.getElementById('morep');
+ put('goals',(hb+8)+'px','top');if(mp)put('morep',(hb+8)+'px','top');
+ // the hint sits centred between the goals and the right edge; if that's too narrow it drops below the goals
+ const gr=g?g.getBoundingClientRect():{right:0,bottom:hb},side=Math.round(gr.right+10),room=innerWidth-2*side;
+ if(room>=260){put('hint',side+'px','left');put('hint',side+'px','right');put('hint',(hb+8)+'px','top')}
+ else{put('hint','10px','left');put('hint','10px','right');put('hint',Math.round(Math.max(hb,gr.bottom)+8)+'px','top')}}
+function setupMore(){const b=document.getElementById('more'),p=document.getElementById('morep');if(!b||!p)return;
+ b.onclick=e=>{e.stopPropagation();p.hidden=!p.hidden;layoutHud()};
+ addEventListener('pointerdown',e=>{if(!p.hidden&&!p.contains(e.target)&&e.target!==b)p.hidden=true},true)}
+setupMore();
 let shownCash=0,bumpT=0;
 function hud(dt=1){const before=Math.round(shownCash);shownCash+=(G.coins-shownCash)*Math.min(1,dt*9);if(Math.abs(G.coins-shownCash)<.5)shownCash=G.coins;
  const sc=Math.round(shownCash);put('cash','$'+sc);bumpT-=dt;if(sc>before&&bumpT<=0){bumpT=.25;const c=$('cash');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
- put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇':'🔊');
+ put('carry',`🧻 ${carrying}/${CAP()}`);put('spray',`🧴 ${sprays}/${SCAP()}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇 Sound off':'🔊 Sound on');
  const L=level(),a=LEVELS[L-1],b=LEVELS[L];put('lvt','Level '+L);put('lvlbar',(b?(G.served-a)/(b-a)*100:100)+'%','width');
  put('boosts',(boost.speed>0?`<span class="pill">🛴 ${Math.ceil(boost.speed)}s</span>`:'')+(boost.cash>0?`<span class="pill">💵×2 ${Math.ceil(boost.cash)}s</span>`:'')+(boost.magnet>0?`<span class="pill">🧲 ${Math.ceil(boost.magnet)}s</span>`:''),'innerHTML')}
 function setHint(t,x,z){if(x!==undefined&&floorOf(x)!==floorOf(player.position.x)){const L=floorOf(player.position.x)?LIFT1:LIFT0;x=L.x;z=L.z;t+=' (take the 🛗 lift)'}if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
@@ -1160,7 +1195,7 @@ function step(dt){
  sun.position.set(cam.position.x-10,30,cam.position.z+2);sun.target.position.set(cam.position.x,0,cam.position.z-oz);
  if(G.fountain){fw.scale.setScalar(1+Math.sin(now/300)*.03);fw2.position.y=1.5+Math.sin(now/200)*.03;if(Math.random()<dt*1.5)stars(FX,1.7,FZ,1,1.6)}
  dotT-=dt;if(dotT<=0){dotT=.4;menuDot=anyBuyable();put('dot',!menuDot,'hidden');renderGoals();
-  const hb=document.querySelector('.hud').getBoundingClientRect().bottom;put('goals',Math.round(hb+8)+'px','top')}
+  layoutHud()}
  // far-away labels fade out so the screen stays tidy
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  if(snowPts){const a=snowPts.geometry.attributes.position;for(let i=0;i<a.count;i++){let y=a.getY(i)-dt*(2+i%3);if(y<0)y+=25;a.setY(i,y);a.setX(i,a.getX(i)+Math.sin(now/900+i)*dt*.3)}a.needsUpdate=true;snowPts.position.set(cam.position.x,0,cam.position.z-12)}
@@ -1181,6 +1216,15 @@ let armed=false;$('reset').onclick=()=>{if(!armed){armed=true;$('reset').textCon
 /* engine: re-draw labels once the Fredoka font has loaded */
 if(document.fonts)document.fonts.ready.then(()=>LABELS.forEach(l=>{const u=l.userData,t=u.txt;u.txt=null;setLabel(l,t,u.cur)}));
 requestAnimationFrame(frame);
+/* engine: fade the loading screen away once the first picture is drawn, and fade softly when leaving a page */
+(function(){const L=document.getElementById('loader');
+ const done=()=>{if(!L||L.classList.contains('gone'))return;L.classList.add('gone');setTimeout(()=>L.remove(),600)};
+ const fonts=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
+ fonts.then(()=>requestAnimationFrame(()=>requestAnimationFrame(done)));setTimeout(done,4000);
+ addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||a.target||a.hasAttribute('download'))return;
+  const u=new URL(a.href,location.href);if(u.origin!==location.origin||!/(\.html|\/)$/.test(u.pathname))return;
+  e.preventDefault();document.documentElement.classList.add('leaving');setTimeout(()=>{location.href=a.href},260)});
+ addEventListener('pageshow',e=>{if(e.persisted)document.documentElement.classList.remove('leaving')})})();
 }
 </script>
 </body>

@@ -18,11 +18,13 @@
    IDEA: a voxel shop - aisles of shelves, tills at the front, a stockroom at the back and a car park full of trolleys
    COLOUR/TYPE: same toy look as the hotel; Kaden Mart red and green; Fredoka */
 @@hud@@
+@@loader@@
 .card h1{color:#ff5a4e;text-shadow:2px 0px 0 #7a1236,-2px 0px 0 #7a1236,0px 2px 0 #7a1236,0px -2px 0 #7a1236,2px 2px 0 #7a1236,-2px -2px 0 #7a1236,2px -2px 0 #7a1236,-2px 2px 0 #7a1236,0 5px 0 #7a1236}
 #start{background:radial-gradient(circle at 50% 40%,#e2366bcc,#3a0b1ae6)}
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">🛒</span>Kaden Mart<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <div id="stage"></div>
 <div class="hud">
  <span class="pill" id="cash">$0</span>
@@ -31,10 +33,14 @@
  <span class="pill" id="park">🚗 0/8</span>
  <span class="pill" id="lvl"><em>⭐</em> <span id="lvt">Level 1</span><i><b id="lvlbar"></b></i></span>
  <span id="boosts"></span>
- <div id="hint">Walk around with your finger 👆</div>
+ <span class="grow"></span>
  <button class="btn mgr" id="mgr">🛒 Manager<i id="dot" hidden>!</i></button>
+ <button class="btn small" id="more" aria-label="More buttons">☰</button>
+</div>
+<div id="hint">Walk around with your finger 👆</div>
+<div id="morep" hidden>
  <button class="btn" id="snd" aria-label="Sound on or off">🔊</button>
- <a class="btn small" id="home" href="index.html" style="text-decoration:none;display:inline-grid;place-items:center">🏠 Home</a>
+ <a class="btn small" id="home" href="index.html">🏠 Home</a>
  <button class="btn small" id="reset">Start over</button>
 </div>
 <div id="goals"><button id="gh">🎯 Goals</button><div id="glist"></div></div>
@@ -410,7 +416,7 @@ function renderGoals(){const h=G.goals.map((g,i)=>{const t=GOALT.find(x=>x.type=
 $('glist').onclick=e=>{const el=e.target.closest('[data-g]');if(!el)return;const i=+el.dataset.g,g=G.goals[i];if(!g||gProg(g)<g.need)return;
  G.coins+=g.reward;bump=1;stars(player.position.x,1.5,player.position.z,30,4.5);celebrate(`Goal done! +$${g.reward}`);G.goals.splice(i,1);G.goals.push(newGoal());save();renderGoals()};
 $('gh').onclick=()=>{G.gmin=!G.gmin;$('goals').classList.toggle('min',G.gmin);save()};
-fillGoals();if(G.gmin||innerWidth<600)$('goals').classList.add('min');
+fillGoals();if(G.gmin||innerWidth<600||innerHeight<500)$('goals').classList.add('min');
 
 /* ---------- customers ---------- */
 const SHIRTS=['#5a8cff','#ff8a3d','#9b5de5','#00bbf9','#f15bb5','#43aa8b','#ffd23f','#ff4d4d','#8d6e63'];
@@ -509,10 +515,11 @@ function collide(p){for(const c of C){if(!c.on)continue;const nx=Math.max(c.x1,M
 /* ---------- main loop ---------- */
 let last=performance.now(),saveT=0,running=false,started=false,hintTxt='',pileT=0,rollT=0,dotT=0,menuDot=false;
 @@put@@
+@@layout@@
 let shownCash=0,bumpT=0;
 function hud(dt=1){const before=Math.round(shownCash);shownCash+=(G.coins-shownCash)*Math.min(1,dt*9);if(Math.abs(G.coins-shownCash)<.5)shownCash=G.coins;
  const sc=Math.round(shownCash);put('cash','$'+sc);bumpT-=dt;if(sc>before&&bumpT<=0){bumpT=.25;const c=$('cash');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
- put('carry',`📦 ${boxes}/${BCAP()}`);put('bayp',`🛒 ${bayN()}/${T.length}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇':'🔊');
+ put('carry',`📦 ${boxes}/${BCAP()}`);put('bayp',`🛒 ${bayN()}/${T.length}`);put('park',`🚗 ${cars.filter(c=>c.space).length}/${SPACES()}`);put('snd',G.mute?'🔇 Sound off':'🔊 Sound on');
  const L=level(),a=LEVELS[L-1],b=LEVELS[L];put('lvt','Level '+L);put('lvlbar',(b?(G.served-a)/(b-a)*100:100)+'%','width');
  put('boosts',(boost.speed>0?`<span class="pill">🛴 ${Math.ceil(boost.speed)}s</span>`:'')+(boost.cash>0?`<span class="pill">💵×2 ${Math.ceil(boost.cash)}s</span>`:'')+(boost.magnet>0?`<span class="pill">🧲 ${Math.ceil(boost.magnet)}s</span>`:''),'innerHTML')}
 function setHint(t,x,z){if(t!==hintTxt){hintTxt=t;const h=$('hint');h.textContent=t;h.classList.remove('new');void h.offsetWidth;h.classList.add('new')}arrow.visible=x!==undefined;if(x!==undefined){arrow.position.set(x,2.2+Math.sin(performance.now()/200)*.25,z);arrow.rotation.y+=.03}}
@@ -646,7 +653,7 @@ function step(dt){
  cam.lookAt(cam.position.x,0,cam.position.z-oz);
  sun.position.set(cam.position.x-10,30,cam.position.z+2);sun.target.position.set(cam.position.x,0,cam.position.z-oz);
  dotT-=dt;if(dotT<=0){dotT=.4;menuDot=anyBuyable();put('dot',!menuDot,'hidden');renderGoals();
-  const hb=document.querySelector('.hud').getBoundingClientRect().bottom;put('goals',Math.round(hb+8)+'px','top')}
+  layoutHud()}
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  saveT+=dt;if(saveT>3){saveT=0;save()}
  hud(dt)}
@@ -663,6 +670,7 @@ let armed=false;$('reset').onclick=()=>{if(!armed){armed=true;$('reset').textCon
  running=false;G=JSON.parse(JSON.stringify(DEF));save();location.reload()};
 @@fonts@@
 requestAnimationFrame(frame);
+@@smooth@@
 }
 </script>
 </body>

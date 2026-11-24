@@ -90,9 +90,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:#9bd4ff;font:600 17px/
  #who{top:calc(66px + env(safe-area-inset-top));font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){#cursor{animation:none!important}}
+@@loader@@
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">✂️</span>Kaden's Kutz<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <div id="stage"></div>
 <div id="top">
  <a class="btn" href="index.html" id="home">🏠</a>
@@ -393,6 +395,7 @@ resize();
 @@fonts@@
 requestAnimationFrame(frame);
 window.addEventListener('pagehide',()=>{try{localStorage.setItem(KEY,JSON.stringify(G))}catch(e){}});
+@@smooth@@
 }
 </script>
 </body>

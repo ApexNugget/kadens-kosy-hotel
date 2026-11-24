@@ -58,9 +58,11 @@ h1{position:relative;z-index:1;margin:0 0 6px;text-align:center;font-size:clamp(
 .play{margin-top:14px;background:linear-gradient(#ffe680,#ffc21a);border:4px solid var(--ink);border-radius:18px;padding:8px 34px;font-size:28px;font-weight:700;box-shadow:0 5px 0 var(--ink);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.07)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@@loader@@
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">🎮</span>Kaden's Games<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <h1>Kaden's Games</h1>
 <div class="sub">Which one do you want to play? 👇</div>
 <div class="games">
@@ -147,6 +149,7 @@ for(let k=0;k<5;k++){const c=document.createElement('div');c.className='cloud';c
  c.style.animationDuration=(40+Math.random()*40)+'s';c.style.animationDelay=(-Math.random()*60)+'s';document.body.appendChild(c)}
 for(let k=0;k<14;k++){const t=document.createElement('div');t.className='tw';t.textContent='★';t.style.left=Math.random()*96+'vw';t.style.top=Math.random()*60+'vh';
  t.style.fontSize=(12+Math.random()*22)+'px';t.style.animationDelay=Math.random()*2+'s';document.body.appendChild(t)}
+@@smooth@@
 }
 </script>
 </body>

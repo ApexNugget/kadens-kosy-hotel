@@ -67,6 +67,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fd3f7;font:600 17px/
 #fade{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9;transition:opacity .35s}
 #fade.on{opacity:1}
 .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0006;z-index:8;padding:12px}
+#map{background:radial-gradient(circle at 50% 40%,#ffffff22,#0004)}
 [hidden]{display:none!important}
 .card{background:linear-gradient(#fffef9,#f6ecd4);border:4px solid var(--ink);border-radius:24px;padding:16px;width:min(760px,100%);max-height:calc(100vh - 24px);overflow:auto;text-align:center;box-shadow:0 8px 0 #0004;animation:pop .3s cubic-bezier(.2,1.6,.4,1)}
 .card h1{margin:0;font-size:clamp(34px,7vw,58px);line-height:1;color:#ffd23f;text-shadow:3px 0 0 var(--ink),-3px 0 0 var(--ink),0 3px 0 var(--ink),0 -3px 0 var(--ink),3px 3px 0 var(--ink),-3px -3px 0 var(--ink),3px -3px 0 var(--ink),-3px 3px 0 var(--ink),0 7px 0 var(--ink)}
@@ -99,12 +100,25 @@ html,body{margin:0;height:100%;overflow:hidden;background:#8fd3f7;font:600 17px/
 .ans button{min-width:120px;font-size:24px;flex-direction:column;padding:6px 14px}.ans button small{font-size:15px;opacity:.75}
 .ans button.wrong{animation:shake .35s;filter:grayscale(.8)}
 #counter.off{filter:grayscale(1);opacity:.55;pointer-events:none}
+@media(max-height:500px){.card h1{font-size:30px}.card h2{margin:2px 0 6px;font-size:19px}#places{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:6px;margin:4px 0 8px}.place{padding:5px 4px;font-size:14px}.place .pe{font-size:30px}.place small{font-size:12px}.card{padding:10px 12px}}
 @media(max-height:500px){:root{--b:min(58px,calc((100vh - 120px)/2 - 14px))}#hud{flex-direction:row;flex-wrap:wrap;max-width:30vw}#order{left:auto;right:8px;translate:0 0;top:calc(62px + env(safe-area-inset-top));padding:2px 10px 4px;min-width:120px}#order::after{display:none}#order .who{font-size:14px}#hint{display:none}}
 @media(max-aspect-ratio:9/10){:root{--b:min(62px,calc((100vw - 64px)/6 - 8px))}#order{top:calc(110px + env(safe-area-inset-top))}}
 @media(prefers-reduced-motion:reduce){.cb.glow,.fx{animation-duration:.01s}}
+/* engine: loading screen and the soft fade between pages */
+#loader{position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#d6f2ff,#6ec6ff);transition:opacity .45s ease}
+#loader.gone{opacity:0;pointer-events:none}
+#loader .ld{display:flex;flex-direction:column;align-items:center;gap:6px;font:700 26px Fredoka,"Arial Rounded MT Bold",system-ui,sans-serif;color:#2b2140;text-align:center;padding:0 20px}
+#loader .le{font-size:84px;line-height:1.1;animation:ldb .7s ease-in-out infinite alternate}
+@keyframes ldb{to{transform:translateY(-16px) rotate(6deg)}}
+#loader i{font-style:normal;font-size:18px;opacity:.75}#loader i span{animation:ldd 1.2s infinite}#loader i span:nth-child(2){animation-delay:.2s}#loader i span:nth-child(3){animation-delay:.4s}
+@keyframes ldd{50%{opacity:.1}}
+html.leaving body::after{content:"";position:fixed;inset:0;z-index:100;background:#bfe9ff;animation:kgleave .26s ease-in forwards}
+@keyframes kgleave{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#loader .le,#loader i span{animation:none}}
 </style>
 </head>
 <body>
+<div id="loader"><div class="ld"><span class="le">🍦</span>Kaden's Kool Kones<i>Loading<span>.</span><span>.</span><span>.</span></i></div></div>
 <div id="stage"></div>
 <div id="hud" hidden>
  <span class="pill" id="cash">$0</span>
@@ -671,6 +685,15 @@ setPaint();resize();showMap();
 /* engine: re-draw labels once the Fredoka font has loaded */
 if(document.fonts)document.fonts.ready.then(()=>LABELS.forEach(l=>{const u=l.userData,t=u.txt;u.txt=null;setLabel(l,t,u.cur)}));
 requestAnimationFrame(frame);
+/* engine: fade the loading screen away once the first picture is drawn, and fade softly when leaving a page */
+(function(){const L=document.getElementById('loader');
+ const done=()=>{if(!L||L.classList.contains('gone'))return;L.classList.add('gone');setTimeout(()=>L.remove(),600)};
+ const fonts=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve();
+ fonts.then(()=>requestAnimationFrame(()=>requestAnimationFrame(done)));setTimeout(done,4000);
+ addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||a.target||a.hasAttribute('download'))return;
+  const u=new URL(a.href,location.href);if(u.origin!==location.origin||!/(\.html|\/)$/.test(u.pathname))return;
+  e.preventDefault();document.documentElement.classList.add('leaving');setTimeout(()=>{location.href=a.href},260)});
+ addEventListener('pageshow',e=>{if(e.persisted)document.documentElement.classList.remove('leaving')})})();
 }
 </script>
 </body>
