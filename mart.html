@@ -48,6 +48,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 #inf.off{opacity:0}
 .fx{position:fixed;z-index:5;pointer-events:none;font-size:26px;color:#fff;text-shadow:0 2px 0 #0008;animation:up 1s ease-out forwards;translate:-50% -50%;white-space:nowrap}
 .fx.big{font-size:46px;animation-duration:2s}
+.fx.jack{font-size:54px;color:#ffd23f;text-shadow:3px 0 0 #7a4a00,-3px 0 0 #7a4a00,0 3px 0 #7a4a00,0 -3px 0 #7a4a00,0 6px 0 #7a4a00;animation:jack 2s ease-out forwards}
+@keyframes jack{0%{transform:scale(.3)}15%{transform:scale(1.25)}25%{transform:scale(1)}80%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
 .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0006;z-index:9}
 [hidden]{display:none!important}
 .card{position:relative;background:linear-gradient(#fffef9,#f6ecd4);border:4px solid #3b2a1a;border-radius:22px;padding:20px 22px;width:min(480px,calc(100vw - 32px));text-align:center;box-shadow:0 8px 0 #0004}
@@ -390,7 +392,7 @@ function buildTill(t){t.built=true;t.col.on=true;t.tape.visible=false;const x=t.
  box(1,.95,2.6,'#5d6b7a',x,.48,3.1);box(.8,.04,1.7,'#2b2140',x,.97,2.6);box(.6,.34,.5,'#efe7d3',x,1.12,3.95);box(.06,.3,.42,'#4dd2d2',x+.3,1.25,3.95);
  box(.08,1.5,.08,'#c0c0c0',x-.45,1.7,4.3);const l=label('💵 Till '+(t.i+1),'#4cb050',.6);l.position.set(x-.45,2.9,4.3);
  t.pileV=makePile(t.px,t.pz,16);drawPile(t)}
-function drawPile(t){const v=G.pile[t.i]||0,n=Math.min(16,Math.ceil(v/3));t.pileV.arr.forEach((m,k)=>m.visible=k<n);t.pileV.l.visible=v>0;setLabel(t.pileV.l,'$'+v)}
+function drawPile(t){const v=G.pile[t.i]||0,n=Math.min(16,Math.ceil(v/3));t.pileV.arr.forEach((m,k)=>m.visible=k<n);t.pileV.l.visible=v>0;cashLabel(t.pileV.l,v)}
 const qslot=(t,j)=>({x:t.lane,z:3.3-1.7*j});
 const openTills=()=>TILLS.filter(t=>t.built);
 
@@ -405,7 +407,7 @@ function buildStand(s){if(s.built)return;s.built=true;
   box(.08,1.4,.08,'#c0c0c0',s.x,1.7,s.z);box(2,.12,2,'#ffd23f',s.x,2.4,s.z);box(1.4,.12,1.4,'#ff4d4d',s.x,2.5,s.z);
   [0,1,2].forEach(k=>box(.24,.24,.24,['#ff8ad8','#fff3c4','#7bd35a'][k],s.x-.5+k*.5,1.12,s.z));C.push({x1:s.x-.9,x2:s.x+.9,z1:s.z-.5,z2:s.z+.5,on:true})}
  s.pileV=makePile(s.px,s.pz,12);const l=label(s.icon+(s.id==='cafe'?' Café':' Ice cream'),'#fffaf0',.8);l.position.set(s.x,3,s.z);drawStand(s)}
-function drawStand(s){const v=G.sp[s.id]||0,n=Math.min(12,Math.ceil(v/4));s.pileV.arr.forEach((m,k)=>m.visible=k<n);s.pileV.l.visible=v>0;setLabel(s.pileV.l,'$'+v)}
+function drawStand(s){const v=G.sp[s.id]||0,n=Math.min(12,Math.ceil(v/4));s.pileV.arr.forEach((m,k)=>m.visible=k<n);s.pileV.l.visible=v>0;cashLabel(s.pileV.l,v)}
 
 /* ---------- road and car park ---------- */
 const ROADZ=22,AISLEZ=15.7,ROWZ=[13.6,17.8],SX=[6,8.4,10.8,13.2,15.6,18,20.4,22.8];
@@ -511,10 +513,29 @@ const myTrolleys=()=>T.filter(t=>t.st==='carried'&&t.by===player);
 /* ---------- flying things ---------- */
 /* engine: things that fly in an arc (cash, items) */
 const flyers=[];
-function fly(geo,m,from,toFn,dur,onLand){const mesh=new THREE.Mesh(geo,m);mesh.position.copy(from);scene.add(mesh);flyers.push({mesh,from:from.clone(),toFn,t:0,dur,onLand})}
-function stepFlyers(dt){for(let k=flyers.length-1;k>=0;k--){const f=flyers[k];f.t+=dt/f.dur;const e=Math.min(1,f.t),to=f.toFn();
- f.mesh.position.lerpVectors(f.from,to,e);f.mesh.position.y+=Math.sin(Math.PI*e)*1.4;f.mesh.rotation.y+=dt*9;f.mesh.rotation.z=Math.sin(e*Math.PI)*.6;
+// o.delay waits before taking off, o.h is the arc height, o.side swings it out sideways (for swirls)
+function fly(geo,m,from,toFn,dur,onLand,o={}){const mesh=new THREE.Mesh(geo,m);mesh.position.copy(from);mesh.visible=!o.delay;scene.add(mesh);flyers.push({mesh,from:from.clone(),toFn,t:-(o.delay||0)/dur,dur,onLand,h:o.h||1.4,side:o.side||0})}
+function stepFlyers(dt){for(let k=flyers.length-1;k>=0;k--){const f=flyers[k];f.t+=dt/f.dur;if(f.t<0)continue;f.mesh.visible=true;const e=Math.min(1,f.t),to=f.toFn();
+ f.mesh.position.lerpVectors(f.from,to,e);const arc=Math.sin(Math.PI*e);f.mesh.position.y+=arc*f.h;
+ if(f.side){const dx=to.x-f.from.x,dz=to.z-f.from.z,l=Math.hypot(dx,dz)||1;f.mesh.position.x+=-dz/l*f.side*arc;f.mesh.position.z+=dx/l*f.side*arc}f.mesh.rotation.y+=dt*9;f.mesh.rotation.z=Math.sin(e*Math.PI)*.6;
  if(f.t>=1){scene.remove(f.mesh);flyers.splice(k,1);f.onLand&&f.onLand()}}}
+/* engine: picking up cash piles. Small piles come in a few bills at a time;
+   a big pile (the label turns gold) comes in all at once as a jackpot swirl */
+function jackpotAt(){return 30}
+function cashLabel(l,v){const big=v>=jackpotAt();setLabel(l,(big?'💰 $':'$')+v,big?'#ffd23f':undefined)}
+function grabPile(get,set,px,pz,draw){const v=get();if(v<=0)return;const close=near(px,pz,1.5);if(!(boost.magnet>0||close))return;
+ if(v>=jackpotAt()){set(0);draw();jackpot(v,px,pz);return}
+ if(pileT<=.07)return;pileT=0;const n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
+ fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!close?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}
+function jackpot(v,px,pz){const N=Math.max(8,Math.min(24,Math.ceil(v/6))),each=Math.floor(v/N);let landed=0;
+ tone(1046,.08,'square',0,.06);tone(1568,.12,'square',.07,.06);
+ for(let k=0;k<N;k++){const share=k===N-1?v-each*(N-1):each;
+  fly(billGeo,billMat,W3(px+(Math.random()-.5)*.7,.35+Math.random()*.4,pz+(Math.random()-.5)*.7),backTop,.5+Math.random()*.3,()=>{
+    G.coins+=share;stat('cash',share);bump=1.6;landed++;tone(620+landed*40,.05,'square',0,.035);
+    if(landed===N){sfx.level();const P=player.position;stars(P.x,1.6,P.z,40,5);
+     v3.set(P.x,2.9,P.z).project(cam);const d=document.createElement('div');d.className='fx big jack';d.textContent='+$'+v+'! 💰';
+     d.style.left=((v3.x+1)/2*innerWidth)+'px';d.style.top=((1-v3.y)/2*innerHeight)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),2000)}},
+   {delay:k*.035,h:1.8+Math.random()*1.6,side:(Math.random()-.5)*3})}}
 const backTop=()=>backG.localToWorld(new THREE.Vector3(0,(Math.min(23,backCount())>>1)*.095+.1,0));
 const handTop=()=>pBox.hg.localToWorld(new THREE.Vector3(0,(boxes>>1)*.35+.2,0));
 const W3=(x,y,z)=>new THREE.Vector3(x,y,z);
@@ -951,8 +972,7 @@ function step(dt){
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  saveT+=dt;if(saveT>3){saveT=0;save()}
  hud(dt)}
-function grabCash(get,set,px,pz,draw){if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
- fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}}
+const grabCash=grabPile;
 /* engine: main animation loop and resize */
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(running)step(dt);renderer.render(scene,cam);requestAnimationFrame(frame)}
 function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}

@@ -175,7 +175,7 @@ function buildTill(t){t.built=true;t.col.on=true;t.tape.visible=false;const x=t.
  box(1,.95,2.6,'#5d6b7a',x,.48,3.1);box(.8,.04,1.7,'#2b2140',x,.97,2.6);box(.6,.34,.5,'#efe7d3',x,1.12,3.95);box(.06,.3,.42,'#4dd2d2',x+.3,1.25,3.95);
  box(.08,1.5,.08,'#c0c0c0',x-.45,1.7,4.3);const l=label('💵 Till '+(t.i+1),'#4cb050',.6);l.position.set(x-.45,2.9,4.3);
  t.pileV=makePile(t.px,t.pz,16);drawPile(t)}
-function drawPile(t){const v=G.pile[t.i]||0,n=Math.min(16,Math.ceil(v/3));t.pileV.arr.forEach((m,k)=>m.visible=k<n);t.pileV.l.visible=v>0;setLabel(t.pileV.l,'$'+v)}
+function drawPile(t){const v=G.pile[t.i]||0,n=Math.min(16,Math.ceil(v/3));t.pileV.arr.forEach((m,k)=>m.visible=k<n);t.pileV.l.visible=v>0;cashLabel(t.pileV.l,v)}
 const qslot=(t,j)=>({x:t.lane,z:3.3-1.7*j});
 const openTills=()=>TILLS.filter(t=>t.built);
 
@@ -190,7 +190,7 @@ function buildStand(s){if(s.built)return;s.built=true;
   box(.08,1.4,.08,'#c0c0c0',s.x,1.7,s.z);box(2,.12,2,'#ffd23f',s.x,2.4,s.z);box(1.4,.12,1.4,'#ff4d4d',s.x,2.5,s.z);
   [0,1,2].forEach(k=>box(.24,.24,.24,['#ff8ad8','#fff3c4','#7bd35a'][k],s.x-.5+k*.5,1.12,s.z));C.push({x1:s.x-.9,x2:s.x+.9,z1:s.z-.5,z2:s.z+.5,on:true})}
  s.pileV=makePile(s.px,s.pz,12);const l=label(s.icon+(s.id==='cafe'?' Café':' Ice cream'),'#fffaf0',.8);l.position.set(s.x,3,s.z);drawStand(s)}
-function drawStand(s){const v=G.sp[s.id]||0,n=Math.min(12,Math.ceil(v/4));s.pileV.arr.forEach((m,k)=>m.visible=k<n);s.pileV.l.visible=v>0;setLabel(s.pileV.l,'$'+v)}
+function drawStand(s){const v=G.sp[s.id]||0,n=Math.min(12,Math.ceil(v/4));s.pileV.arr.forEach((m,k)=>m.visible=k<n);s.pileV.l.visible=v>0;cashLabel(s.pileV.l,v)}
 
 /* ---------- road and car park ---------- */
 const ROADZ=22,AISLEZ=15.7,ROWZ=[13.6,17.8],SX=[6,8.4,10.8,13.2,15.6,18,20.4,22.8];
@@ -266,6 +266,7 @@ const myTrolleys=()=>T.filter(t=>t.st==='carried'&&t.by===player);
 
 /* ---------- flying things ---------- */
 @@fly@@
+@@cash@@
 const backTop=()=>backG.localToWorld(new THREE.Vector3(0,(Math.min(23,backCount())>>1)*.095+.1,0));
 const handTop=()=>pBox.hg.localToWorld(new THREE.Vector3(0,(boxes>>1)*.35+.2,0));
 const W3=(x,y,z)=>new THREE.Vector3(x,y,z);
@@ -657,8 +658,7 @@ function step(dt){
  LABELS.forEach(l=>{if(l.userData.keep)return;const d=Math.hypot(l.position.x-P.x,l.position.z-P.z);l.material.opacity=Math.max(0,Math.min(1,(19-d)/5))});
  saveT+=dt;if(saveT>3){saveT=0;save()}
  hud(dt)}
-function grabCash(get,set,px,pz,draw){if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
- fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}}
+const grabCash=grabPile;
 @@frame@@
 cam.position.set(-10,17,15);cam.lookAt(-10,0,4);sun.position.set(-15,30,12);hud();
 for(let k=0;k<18;k++){const t=document.createElement('div');t.className='tw';t.textContent='★';t.style.left=Math.random()*96+'vw';t.style.top=Math.random()*92+'vh';

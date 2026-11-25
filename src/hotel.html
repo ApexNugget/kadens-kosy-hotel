@@ -267,7 +267,7 @@ function buildSnack(p){const i=p.i;p.floor.material=tm('wool:#ffe7a3',3,2.5);
  const pp=LP(p,2.2,0),pv=makePile(pp.x,pp.z,16);if(G.sp[i]==null)G.sp[i]=0;
  const bicon=label('🔧 Jammed','#ff4d4d',1),bp=LP(p,4,0);bicon.position.set(bp.x,2.9,bp.z);bicon.visible=false;
  const s={i,p,px:pp.x,pz:pp.z,pv,t:0,bicon,broken:false,fix:0,fixClaim:null};snacks.push(s);drawSnack(s)}
-function drawSnack(s){const v=G.sp[s.i]||0,n=Math.min(16,Math.ceil(v/3));s.pv.arr.forEach((m,k)=>m.visible=k<n);s.pv.l.visible=v>0;setLabel(s.pv.l,'$'+v)}
+function drawSnack(s){const v=G.sp[s.i]||0,n=Math.min(16,Math.ceil(v/3));s.pv.arr.forEach((m,k)=>m.visible=k<n);s.pv.l.visible=v>0;cashLabel(s.pv.l,v)}
 function buildPlot(i,quiet){const p=plots[i];G.built[i]=1;p.built=true;p.tape.visible=false;p.tapeCol.on=false;
  ({room:buildRoom,suite:buildRoom,loo:buildLoo,snack:buildSnack})[p.type](p);if(!quiet)sfx.build()}
 function styleBeds(){rooms.forEach(r=>{r.blanket.material=tm('wool:'+(G.beds>=2?'#ff4dbb':G.beds?'#ffcf2e':WOOL[(r.i+5)%WOOL.length]),1.5,1.5);r.extra.forEach(b=>b.material=tm('wool:'+(G.beds>=2?'#7fd6ff':G.beds?'#ffe680':WOOL[(r.i+8)%WOOL.length]),1.5,1.5));r.tv.visible=G.beds>=2})}
@@ -279,7 +279,7 @@ box(4.4,1,1,tm('plank:#b8763a',3.5,.8),DX,.5,DZ);box(4.6,.14,1.2,tm('plank:#e2b3
 box(.8,.55,.08,'#2b2140',DX-1.2,1.42,DZ-.2);box(.25,.15,.25,'#ffd23f',DX+1.4,1.21,DZ+.2);
 const deskIcon=label('🛎️',undefined,1.1);
 const PX=-8.4,PZ=1.6,pileV=makePile(PX,PZ,32);
-function drawPile(){const n=Math.min(32,Math.ceil(G.pile/3));pileV.arr.forEach((m,k)=>m.visible=k<n);pileV.l.visible=G.pile>0;setLabel(pileV.l,'$'+G.pile)}
+function drawPile(){const n=Math.min(32,Math.ceil(G.pile/3));pileV.arr.forEach((m,k)=>m.visible=k<n);pileV.l.visible=G.pile>0;cashLabel(pileV.l,G.pile)}
 
 /* lobby bathroom: three stalls along the back wall, walk in and the paper goes to them */
 const LB={lobby:true,toilets:[],zone:{x:15.6,z:5},inside:pos=>pos.x>14.2&&pos.x<19.9&&pos.z>1.2&&pos.z<8.8,claim:null};baths.push(LB);
@@ -318,7 +318,7 @@ const tables=TPOS.map(([x,z],i)=>{const g=new THREE.Group();scene.add(g);
  const lbl=label('$0','#4cb050',.8);lbl.position.set(x,2,z);lbl.visible=false;
  const col={x1:x-.75,x2:x+.75,z1:z-.75,z2:z+.75,on:false};C.push(col);
  return{i,x,z,g,plate,bills,lbl,col,seat:{x:x-1.15,z},serve:{x:x+1.1,z},state:'free',guest:null,claim:null}});
-function drawTable(t){const v=G.tp[t.i]||0,n=Math.min(6,Math.ceil(v/4));t.bills.forEach((m,k)=>m.visible=k<n);t.lbl.visible=v>0;setLabel(t.lbl,'$'+v)}
+function drawTable(t){const v=G.tp[t.i]||0,n=Math.min(6,Math.ceil(v/4));t.bills.forEach((m,k)=>m.visible=k<n);t.lbl.visible=v>0;cashLabel(t.lbl,v)}
 const tableOpen=t=>G.rest&&t.i<G.tables;
 function showTables(){tables.forEach(t=>{const o=tableOpen(t);t.g.visible=o;t.col.on=o;drawTable(t)})}
 function openRestaurant(){G.rest=1;rtape.visible=false;rcol.on=false;showTables();if(!G.staff.c0){G.staff.c0={spd:0,skl:0};addStaff(STAFF.find(e=>e.id==='c0'))}}
@@ -476,6 +476,7 @@ const upCost=(e,l)=>Math.round([60,140,300][l]*(1+e.k*.15)/10)*10;
 
 /* ---------- flying things ---------- */
 @@fly@@
+@@cash@@
 const backTop=()=>backG.localToWorld(new THREE.Vector3(0,(Math.min(23,backCount())>>1)*.095+.1,0));
 const handTop=()=>handG.localToWorld(new THREE.Vector3(0,.3,0));
 const beltPos=()=>beltG.localToWorld(new THREE.Vector3(.4,0,0));
@@ -772,8 +773,7 @@ function step(dt){
  deskIcon.visible=!!(front&&front.arrived&&!atDesk&&!nr);deskIcon.position.set(DX,3+Math.sin(now/180)*.15,DZ-1.4);
 
  pileT+=dt;
- const grab=(get,set,px,pz,draw)=>{if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
-  fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}};
+ const grab=grabPile;
  grab(()=>G.pile,v=>G.pile=v,PX,PZ,drawPile);
  tables.forEach(t=>{if(tableOpen(t))grab(()=>G.tp[t.i]||0,v=>G.tp[t.i]=v,t.x,t.z,()=>drawTable(t))});
  snacks.forEach(s=>{s.t+=dt;if(s.t>3){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=Math.round((4+2*G.snackUp)*cashX());drawSnack(s)}}

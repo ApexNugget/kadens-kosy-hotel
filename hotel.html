@@ -50,6 +50,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font:600 17px/
 #inf.off{opacity:0}
 .fx{position:fixed;z-index:5;pointer-events:none;font-size:26px;color:#fff;text-shadow:0 2px 0 #0008;animation:up 1s ease-out forwards;translate:-50% -50%;white-space:nowrap}
 .fx.big{font-size:46px;animation-duration:2s}
+.fx.jack{font-size:54px;color:#ffd23f;text-shadow:3px 0 0 #7a4a00,-3px 0 0 #7a4a00,0 3px 0 #7a4a00,0 -3px 0 #7a4a00,0 6px 0 #7a4a00;animation:jack 2s ease-out forwards}
+@keyframes jack{0%{transform:scale(.3)}15%{transform:scale(1.25)}25%{transform:scale(1)}80%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
 .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0006;z-index:9}
 [hidden]{display:none!important}
 .card{position:relative;background:linear-gradient(#fffef9,#f6ecd4);border:4px solid #3b2a1a;border-radius:22px;padding:20px 22px;width:min(480px,calc(100vw - 32px));text-align:center;box-shadow:0 8px 0 #0004}
@@ -482,7 +484,7 @@ function buildSnack(p){const i=p.i;p.floor.material=tm('wool:#ffe7a3',3,2.5);
  const pp=LP(p,2.2,0),pv=makePile(pp.x,pp.z,16);if(G.sp[i]==null)G.sp[i]=0;
  const bicon=label('🔧 Jammed','#ff4d4d',1),bp=LP(p,4,0);bicon.position.set(bp.x,2.9,bp.z);bicon.visible=false;
  const s={i,p,px:pp.x,pz:pp.z,pv,t:0,bicon,broken:false,fix:0,fixClaim:null};snacks.push(s);drawSnack(s)}
-function drawSnack(s){const v=G.sp[s.i]||0,n=Math.min(16,Math.ceil(v/3));s.pv.arr.forEach((m,k)=>m.visible=k<n);s.pv.l.visible=v>0;setLabel(s.pv.l,'$'+v)}
+function drawSnack(s){const v=G.sp[s.i]||0,n=Math.min(16,Math.ceil(v/3));s.pv.arr.forEach((m,k)=>m.visible=k<n);s.pv.l.visible=v>0;cashLabel(s.pv.l,v)}
 function buildPlot(i,quiet){const p=plots[i];G.built[i]=1;p.built=true;p.tape.visible=false;p.tapeCol.on=false;
  ({room:buildRoom,suite:buildRoom,loo:buildLoo,snack:buildSnack})[p.type](p);if(!quiet)sfx.build()}
 function styleBeds(){rooms.forEach(r=>{r.blanket.material=tm('wool:'+(G.beds>=2?'#ff4dbb':G.beds?'#ffcf2e':WOOL[(r.i+5)%WOOL.length]),1.5,1.5);r.extra.forEach(b=>b.material=tm('wool:'+(G.beds>=2?'#7fd6ff':G.beds?'#ffe680':WOOL[(r.i+8)%WOOL.length]),1.5,1.5));r.tv.visible=G.beds>=2})}
@@ -494,7 +496,7 @@ box(4.4,1,1,tm('plank:#b8763a',3.5,.8),DX,.5,DZ);box(4.6,.14,1.2,tm('plank:#e2b3
 box(.8,.55,.08,'#2b2140',DX-1.2,1.42,DZ-.2);box(.25,.15,.25,'#ffd23f',DX+1.4,1.21,DZ+.2);
 const deskIcon=label('🛎️',undefined,1.1);
 const PX=-8.4,PZ=1.6,pileV=makePile(PX,PZ,32);
-function drawPile(){const n=Math.min(32,Math.ceil(G.pile/3));pileV.arr.forEach((m,k)=>m.visible=k<n);pileV.l.visible=G.pile>0;setLabel(pileV.l,'$'+G.pile)}
+function drawPile(){const n=Math.min(32,Math.ceil(G.pile/3));pileV.arr.forEach((m,k)=>m.visible=k<n);pileV.l.visible=G.pile>0;cashLabel(pileV.l,G.pile)}
 
 /* lobby bathroom: three stalls along the back wall, walk in and the paper goes to them */
 const LB={lobby:true,toilets:[],zone:{x:15.6,z:5},inside:pos=>pos.x>14.2&&pos.x<19.9&&pos.z>1.2&&pos.z<8.8,claim:null};baths.push(LB);
@@ -533,7 +535,7 @@ const tables=TPOS.map(([x,z],i)=>{const g=new THREE.Group();scene.add(g);
  const lbl=label('$0','#4cb050',.8);lbl.position.set(x,2,z);lbl.visible=false;
  const col={x1:x-.75,x2:x+.75,z1:z-.75,z2:z+.75,on:false};C.push(col);
  return{i,x,z,g,plate,bills,lbl,col,seat:{x:x-1.15,z},serve:{x:x+1.1,z},state:'free',guest:null,claim:null}});
-function drawTable(t){const v=G.tp[t.i]||0,n=Math.min(6,Math.ceil(v/4));t.bills.forEach((m,k)=>m.visible=k<n);t.lbl.visible=v>0;setLabel(t.lbl,'$'+v)}
+function drawTable(t){const v=G.tp[t.i]||0,n=Math.min(6,Math.ceil(v/4));t.bills.forEach((m,k)=>m.visible=k<n);t.lbl.visible=v>0;cashLabel(t.lbl,v)}
 const tableOpen=t=>G.rest&&t.i<G.tables;
 function showTables(){tables.forEach(t=>{const o=tableOpen(t);t.g.visible=o;t.col.on=o;drawTable(t)})}
 function openRestaurant(){G.rest=1;rtape.visible=false;rcol.on=false;showTables();if(!G.staff.c0){G.staff.c0={spd:0,skl:0};addStaff(STAFF.find(e=>e.id==='c0'))}}
@@ -721,10 +723,29 @@ const upCost=(e,l)=>Math.round([60,140,300][l]*(1+e.k*.15)/10)*10;
 /* ---------- flying things ---------- */
 /* engine: things that fly in an arc (cash, items) */
 const flyers=[];
-function fly(geo,m,from,toFn,dur,onLand){const mesh=new THREE.Mesh(geo,m);mesh.position.copy(from);scene.add(mesh);flyers.push({mesh,from:from.clone(),toFn,t:0,dur,onLand})}
-function stepFlyers(dt){for(let k=flyers.length-1;k>=0;k--){const f=flyers[k];f.t+=dt/f.dur;const e=Math.min(1,f.t),to=f.toFn();
- f.mesh.position.lerpVectors(f.from,to,e);f.mesh.position.y+=Math.sin(Math.PI*e)*1.4;f.mesh.rotation.y+=dt*9;f.mesh.rotation.z=Math.sin(e*Math.PI)*.6;
+// o.delay waits before taking off, o.h is the arc height, o.side swings it out sideways (for swirls)
+function fly(geo,m,from,toFn,dur,onLand,o={}){const mesh=new THREE.Mesh(geo,m);mesh.position.copy(from);mesh.visible=!o.delay;scene.add(mesh);flyers.push({mesh,from:from.clone(),toFn,t:-(o.delay||0)/dur,dur,onLand,h:o.h||1.4,side:o.side||0})}
+function stepFlyers(dt){for(let k=flyers.length-1;k>=0;k--){const f=flyers[k];f.t+=dt/f.dur;if(f.t<0)continue;f.mesh.visible=true;const e=Math.min(1,f.t),to=f.toFn();
+ f.mesh.position.lerpVectors(f.from,to,e);const arc=Math.sin(Math.PI*e);f.mesh.position.y+=arc*f.h;
+ if(f.side){const dx=to.x-f.from.x,dz=to.z-f.from.z,l=Math.hypot(dx,dz)||1;f.mesh.position.x+=-dz/l*f.side*arc;f.mesh.position.z+=dx/l*f.side*arc}f.mesh.rotation.y+=dt*9;f.mesh.rotation.z=Math.sin(e*Math.PI)*.6;
  if(f.t>=1){scene.remove(f.mesh);flyers.splice(k,1);f.onLand&&f.onLand()}}}
+/* engine: picking up cash piles. Small piles come in a few bills at a time;
+   a big pile (the label turns gold) comes in all at once as a jackpot swirl */
+function jackpotAt(){return 30}
+function cashLabel(l,v){const big=v>=jackpotAt();setLabel(l,(big?'💰 $':'$')+v,big?'#ffd23f':undefined)}
+function grabPile(get,set,px,pz,draw){const v=get();if(v<=0)return;const close=near(px,pz,1.5);if(!(boost.magnet>0||close))return;
+ if(v>=jackpotAt()){set(0);draw();jackpot(v,px,pz);return}
+ if(pileT<=.07)return;pileT=0;const n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
+ fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!close?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}
+function jackpot(v,px,pz){const N=Math.max(8,Math.min(24,Math.ceil(v/6))),each=Math.floor(v/N);let landed=0;
+ tone(1046,.08,'square',0,.06);tone(1568,.12,'square',.07,.06);
+ for(let k=0;k<N;k++){const share=k===N-1?v-each*(N-1):each;
+  fly(billGeo,billMat,W3(px+(Math.random()-.5)*.7,.35+Math.random()*.4,pz+(Math.random()-.5)*.7),backTop,.5+Math.random()*.3,()=>{
+    G.coins+=share;stat('cash',share);bump=1.6;landed++;tone(620+landed*40,.05,'square',0,.035);
+    if(landed===N){sfx.level();const P=player.position;stars(P.x,1.6,P.z,40,5);
+     v3.set(P.x,2.9,P.z).project(cam);const d=document.createElement('div');d.className='fx big jack';d.textContent='+$'+v+'! 💰';
+     d.style.left=((v3.x+1)/2*innerWidth)+'px';d.style.top=((1-v3.y)/2*innerHeight)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),2000)}},
+   {delay:k*.035,h:1.8+Math.random()*1.6,side:(Math.random()-.5)*3})}}
 const backTop=()=>backG.localToWorld(new THREE.Vector3(0,(Math.min(23,backCount())>>1)*.095+.1,0));
 const handTop=()=>handG.localToWorld(new THREE.Vector3(0,.3,0));
 const beltPos=()=>beltG.localToWorld(new THREE.Vector3(.4,0,0));
@@ -1066,8 +1087,7 @@ function step(dt){
  deskIcon.visible=!!(front&&front.arrived&&!atDesk&&!nr);deskIcon.position.set(DX,3+Math.sin(now/180)*.15,DZ-1.4);
 
  pileT+=dt;
- const grab=(get,set,px,pz,draw)=>{if(get()>0&&(boost.magnet>0||near(px,pz,1.5))&&pileT>.07){pileT=0;const v=get(),n=Math.min(v,Math.max(1,Math.ceil(v/10)));set(v-n);draw();
-  fly(billGeo,billMat,W3(px,.5,pz),backTop,boost.magnet>0&&!near(px,pz,1.5)?.7:.38,()=>{G.coins+=n;stat('cash',n);bump=1;sfx.cash()})}};
+ const grab=grabPile;
  grab(()=>G.pile,v=>G.pile=v,PX,PZ,drawPile);
  tables.forEach(t=>{if(tableOpen(t))grab(()=>G.tp[t.i]||0,v=>G.tp[t.i]=v,t.x,t.z,()=>drawTable(t))});
  snacks.forEach(s=>{s.t+=dt;if(s.t>3){s.t=0;if(level()>=3&&Math.random()<.01)breakIt(s);if(!s.broken&&G.sp[s.i]<45+15*G.snackUp){G.sp[s.i]+=Math.round((4+2*G.snackUp)*cashX());drawSnack(s)}}
