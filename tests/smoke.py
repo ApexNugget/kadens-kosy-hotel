@@ -85,6 +85,17 @@ def play_icecream(pg):
     check(served >= 1, 'icecream: served a customer by following the glowing buttons')
 
 
+def play_kraft(pg):
+    pg.goto(URL + 'kraft.html'); pg.wait_for_timeout(2500)
+    pg.click('#go')
+    pg.keyboard.down('w'); pg.wait_for_timeout(800); pg.keyboard.up('w')
+    pg.mouse.click(512, 520); pg.wait_for_timeout(300)
+    pg.click('#magic'); pg.click('#blist [data-i="0"]'); pg.wait_for_timeout(300)
+    check(not pg.query_selector('#quiz').is_hidden(), 'kraft: magic build asks a question')
+    pg.evaluate("()=>{const b=[...document.querySelectorAll('#qans button')];b.forEach(x=>x.click())}"); pg.wait_for_timeout(3000)
+    check(pg.query_selector('#quiz').is_hidden(), 'kraft: answering starts the build')
+
+
 def main():
     r = subprocess.run([sys.executable, str(ROOT / 'build.py'), '--check'], capture_output=True, text=True)
     check(r.returncode == 0, 'built pages match src/ (python3 build.py --check)')
@@ -92,7 +103,7 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(args=['--use-gl=swiftshader', '--ignore-gpu-blocklist'])
         ctx = browser.new_context(viewport={'width': 1024, 'height': 768})
-        for name, play in [('hotel', play_hotel), ('mart', play_mart), ('barber', play_barber), ('icecream', play_icecream)]:
+        for name, play in [('hotel', play_hotel), ('mart', play_mart), ('barber', play_barber), ('icecream', play_icecream), ('kraft', play_kraft)]:
             pg = page_with_errors(ctx)
             try:
                 play(pg)
@@ -117,7 +128,7 @@ def main():
         pg.evaluate("()=>navigator.serviceWorker.ready")
         pg.reload(); pg.wait_for_timeout(1500)
         ctx.set_offline(True)
-        for page in ['', 'hotel.html', 'mart.html', 'barber.html', 'icecream.html']:
+        for page in ['', 'hotel.html', 'mart.html', 'barber.html', 'icecream.html', 'kraft.html']:
             try:
                 pg.goto(URL + page); pg.wait_for_timeout(1200)
                 ok = pg.evaluate("()=>typeof THREE!=='undefined'||location.pathname.endsWith('/')")
