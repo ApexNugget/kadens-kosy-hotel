@@ -438,14 +438,22 @@ function blockGeo(id){const bd=B[id],p=[],u=[],c=[],ix=[];FACES.forEach((F,f)=>{
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(u,2));g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));g.setIndex(ix);return g}
 // Kaden's arm in the bottom corner, holding whatever is picked in the hotbar
 // the arm is drawn in its own pass on top, so it never sinks into walls
-const hudScene=new THREE.Scene(),hudCam=new THREE.PerspectiveCamera(72,1,.01,10);hudScene.add(hudCam);hudScene.add(new THREE.HemisphereLight(0xffffff,0x8a7a60,.9));{const dl=new THREE.DirectionalLight(0xffffff,.45);dl.position.set(3,8,4);hudScene.add(dl)}
+const hudScene=new THREE.Scene(),hudCam=new THREE.PerspectiveCamera(72,1,.01,10);hudScene.add(hudCam);hudScene.add(new THREE.HemisphereLight(0xffffff,0x8a7a60,.75));{const dl=new THREE.DirectionalLight(0xffffff,.4);dl.position.set(3,8,4);hudScene.add(dl)}
 const heldG=new THREE.Group();hudCam.add(heldG);const armG=new THREE.Group();heldG.add(armG);
-{const sl=new THREE.Mesh(new THREE.BoxGeometry(.2,.2,.7),LM('#2ec4f1'));sl.position.set(0,0,.28);armG.add(sl);const hd=new THREE.Mesh(new THREE.BoxGeometry(.2,.2,.16),LM('#e0a878'));hd.position.set(0,0,-.15);armG.add(hd)}
-armG.rotation.set(.45,.32,0);
+// a slimmer arm with a fist at the end, so the tools look the right size in his hand
+{const sl=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.62),LM('#2ec4f1'));sl.position.set(0,0,.3);armG.add(sl);const hd=new THREE.Mesh(new THREE.BoxGeometry(.13,.13,.13),LM('#e0a878'));hd.position.set(0,0,-.04);armG.add(hd)}
+armG.rotation.set(.5,.3,0);armG.updateMatrix();
+const FIST=new THREE.Vector3(0,.02,-.05).applyMatrix4(armG.matrix);
+// where the hand grips each tool (in the tool's 16x16 pixels): near the bottom of the handle, or the middle of the bow
+const GRIP={100:[3,12.5],101:[3,12.5],102:[3,12.5],103:[2.6,12.6],104:[5.3,5.3]};
+const HOLD={s:.4,rx:-.3,ry:-.95,rz:.18};
 let itemM=null,swing=0;
 function updateHand(){if(itemM){heldG.remove(itemM);itemM=null}const id=G.hot[G.sel];
- if(isTool(id)){itemM=toolMesh(id);itemM.scale.setScalar(.4);if(id===104){itemM.position.set(.02,.1,-.34);itemM.rotation.set(.1,2.6,-.35)}else{itemM.position.set(-.04,.24,-.34);itemM.rotation.set(.15,2.79,.5)}}
- else{itemM=new THREE.Mesh(blockGeo(id),B[id].water?waterMat:solidMat);itemM.scale.setScalar(.22);itemM.position.set(-.08,.17,-.31);itemM.rotation.set(.25,.8,0)}
+ if(isTool(id)){const t=toolMesh(id),[gx,gy]=GRIP[id],m=t.children[0];
+  // put the grip at the middle of the fist, stand the handle straight up, then turn it so the head points forward like a real tool
+  m.position.set(-(gx-8)/16,-(8-gy)/16,0);const up=new THREE.Group();up.rotation.z=Math.PI/4;up.add(t);
+  itemM=new THREE.Group();itemM.add(up);itemM.rotation.order='YXZ';itemM.scale.setScalar(HOLD.s);itemM.position.copy(FIST);if(id===104){itemM.rotation.set(0,-.6,.12);itemM.scale.setScalar(.36);itemM.position.y+=.1}else itemM.rotation.set(HOLD.rx,HOLD.ry,HOLD.rz)}
+ else{itemM=new THREE.Mesh(blockGeo(id),B[id].water?waterMat:solidMat);itemM.scale.setScalar(.2);itemM.position.copy(FIST).add(new THREE.Vector3(-.04,.1,-.08));itemM.rotation.set(.25,.8,0)}
  heldG.add(itemM)}
 
 /* ---------- TNT ---------- */
@@ -724,7 +732,7 @@ $('go').onclick=()=>{$('start').hidden=true;started=true;G.seen=1;sfx.ding();toa
 if(G.seen)$('go').textContent='Play ▶';
 
 /* ---------- loop ---------- */
-function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.fov=cam.aspect<1?82:72;cam.updateProjectionMatrix();hudCam.aspect=cam.aspect;hudCam.fov=cam.fov;hudCam.updateProjectionMatrix();heldG.position.set(cam.aspect<1?.36:.52,-.46,-.62)}
+function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.fov=cam.aspect<1?82:72;cam.updateProjectionMatrix();hudCam.aspect=cam.aspect;hudCam.fov=cam.fov;hudCam.updateProjectionMatrix();heldG.position.set(cam.aspect<1?.28:.42,-.33,-.62)}
 addEventListener('resize',resize);
 let last=performance.now(),tidyT=0;
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(started)step(dt,now);render(dt,now);requestAnimationFrame(frame)}
@@ -757,7 +765,7 @@ function render(dt,now){
  stream(2);tidyT-=dt;if(tidyT<=0){tidyT=.7;tidy()}
  shake=Math.max(0,shake-dt);const sh=shake*.25;
  cam.position.set(P.x+rnd(-sh,sh),P.y+EYE+Math.sin(walkPh)*.05+rnd(-sh,sh),P.z+rnd(-sh,sh));cam.rotation.set(pitch,yaw,0);
- swing=Math.max(0,swing-dt*4);const sw=Math.sin(swing*Math.PI);heldG.position.set(cam.aspect<1?.36:.52,-.46+Math.sin(walkPh*.5)*.02-sw*.06,-.62-sw*.1);heldG.rotation.set(-sw*.7,sw*.25,0);
+ swing=Math.max(0,swing-dt*4);const sw=Math.sin(swing*Math.PI);heldG.position.set(cam.aspect<1?.28:.42,-.33+Math.sin(walkPh*.5)*.02-sw*.06,-.62-sw*.1);heldG.rotation.set(-sw*.7,sw*.25,0);
  sun.position.set(cam.position.x+80,cam.position.y+90,cam.position.z-60);sun.lookAt(cam.position);
  clouds.forEach(c=>{c.position.x+=dt*1.2;if(c.position.x>P.x+120)c.position.x-=240;if(c.position.x<P.x-120)c.position.x+=240;if(c.position.z>P.z+120)c.position.z-=240;if(c.position.z<P.z-120)c.position.z+=240});
  sea.position.x=P.x;sea.position.z=P.z;
