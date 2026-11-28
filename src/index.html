@@ -126,7 +126,7 @@ const LV=[0,3,8,15,24,35,50,70,95,125,160,200,250,310,380,460,550,650,760,880];
 const lv=k=>{try{const s=JSON.parse(localStorage.getItem(k)||'null');return s?LV.filter(t=>(s.served||0)>=t).length:0}catch(e){return 0}};
 const h=Math.max(lv('kadenHotel2'),lv('kadenHotel2_beach'),lv('kadenHotel2_snow')),m=lv('kadenMart1'),ic=lv('kadenIce1');
 if(ic)document.getElementById('ilv').textContent=`⭐ Level ${ic}`;
-try{const k=JSON.parse(localStorage.getItem('kadenKraft1')||'null');if(k&&k.ch&&k.ch.length)document.getElementById('klv').textContent=`🧱 ${k.ch.length/2|0} blocks built`}catch(e){}
+try{const k=JSON.parse(localStorage.getItem('kadenKraft2')||'null');let n=0;if(k&&k.ck)for(const a of Object.values(k.ck))n+=(a.length/2)|0;if(n)document.getElementById('klv').textContent=`🧱 ${n} blocks built`}catch(e){}
 const hotels=[lv('kadenHotel2_beach')?1:0,lv('kadenHotel2_snow')?1:0].reduce((a,b)=>a+b,1);
 if(h)document.getElementById('hlv').textContent=`⭐ Level ${h}`+(hotels>1?` · ${hotels} hotels`:'');
 if(m)document.getElementById('mlv').textContent=`⭐ Level ${m}`;
