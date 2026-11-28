@@ -2,7 +2,7 @@
    Pages: try the internet first so updates arrive, fall back to the saved copy when offline.
    Everything else (three.js, icons): use the saved copy, fetch it if missing.
    Bump VERSION when three.min.js or the icons change. */
-const VERSION='kg-pages-v5',FONTS='kg-fonts';
+const VERSION='kg-pages-v6',FONTS='kg-fonts';
 const CORE=['./','index.html','hotel.html','mart.html','barber.html','icecream.html','kraft.html','three.min.js','manifest.json','icon-180.png','icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kg-pages-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
