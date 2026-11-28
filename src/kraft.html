@@ -375,25 +375,62 @@ function stepParts(dt){for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.lif
  partIM.count=parts.length;partIM.instanceMatrix.needsUpdate=true;if(partIM.instanceColor)partIM.instanceColor.needsUpdate=true}
 
 /* ---------- tools, weapons and the arm holding them ---------- */
-const TOOL={100:{n:'Pickaxe',e:'⛏️',dig:[STONE,COBBLE,BRICK,GOLD,DIAM,LAMP,GLASS,TNT,SANDST,COAL,IRON,GOLDORE,SBRICK,QUARTZ,FURN]},101:{n:'Shovel',e:'🪏',dig:[GRASS,DIRT,SAND,SNOW,GRAVEL,SNOWG]},102:{n:'Axe',e:'🪓',dig:[LOG,PLANK,LEAF,BIRCH,SPRUCE,BLEAF,SLEAF,DPLANK,BOOKS,CRAFT,CHEST,CACTUS]},103:{n:'Sword',e:'🗡️',weapon:1},104:{n:'Bow',e:'🏹',bow:1}};
+const TOOL={100:{n:'Pickaxe',e:'⛏️',d:'digs stone and ore fast',dig:[STONE,COBBLE,BRICK,GOLD,DIAM,LAMP,GLASS,TNT,SANDST,COAL,IRON,GOLDORE,SBRICK,QUARTZ,FURN]},101:{n:'Shovel',e:'🪏',d:'digs dirt, sand and snow fast',dig:[GRASS,DIRT,SAND,SNOW,GRAVEL,SNOWG]},102:{n:'Axe',e:'🪓',d:'chops wood and leaves fast',dig:[LOG,PLANK,LEAF,BIRCH,SPRUCE,BLEAF,SLEAF,DPLANK,BOOKS,CRAFT,CHEST,CACTUS]},103:{n:'Sword',e:'🗡️',d:'bonk the slimes!',weapon:1},104:{n:'Bow',e:'🏹',d:'tap to shoot arrows',bow:1}};
 const isTool=id=>id>=100;
 const itemName=id=>isTool(id)?TOOL[id].n:B[id].n;
-function toolMesh(id){const g=new THREE.Group(),bx=(w,h,d,c,x,y,z,rz=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),LM(c));m.position.set(x,y,z);m.rotation.z=rz;g.add(m);return m};
- const WD='#8b5a2b',DI='#5ff2ec',DK='#22a8a0';
- if(id===100){bx(.07,.9,.07,WD,0,0,0);bx(.6,.11,.11,DI,0,.42,0);bx(.13,.17,.11,DK,-.31,.34,0,.5);bx(.13,.17,.11,DK,.31,.34,0,-.5)}
- if(id===101){bx(.07,.82,.07,WD,0,0,0);bx(.25,.3,.05,DI,0,.52,0);bx(.09,.09,.06,DK,0,.35,0)}
- if(id===102){bx(.07,.9,.07,WD,0,0,0);bx(.3,.27,.07,DI,.15,.34,0);bx(.08,.33,.075,DK,.31,.34,0)}
- if(id===103){bx(.06,.24,.06,WD,0,-.33,0);bx(.34,.07,.08,'#3b2a1a',0,-.2,0);bx(.12,.72,.04,DI,0,.18,0);bx(.05,.64,.046,'#d8fffc',0,.17,0)}
- if(id===104){for(let k=-3;k<=3;k++)bx(.07,.15,.07,WD,-.18*(1-k*k/9),k*.13,0,k*.2);bx(.012,.8,.012,'#ffffff',.03,0,0);bx(.03,.03,.5,'#d9c3a0',.03,0,-.1)}
- return g}
-// a little picture of each tool for the hotbar and the menu
-function toolIcon(id){const c=document.createElement('canvas');c.width=c.height=48;const x=c.getContext('2d');x.translate(24,24);x.rotate(id===104?0:-Math.PI/4);
- const r=(w,h,col,px,py)=>{x.fillStyle=col;x.fillRect(px-w/2,py-h/2,w,h);x.strokeStyle='#00000055';x.lineWidth=1;x.strokeRect(px-w/2,py-h/2,w,h)};const WD='#8b5a2b',DI='#5ff2ec',DK='#22a8a0';
- if(id===100){r(5,34,WD,0,4);r(30,6,DI,0,-12);r(6,8,DK,-15,-8);r(6,8,DK,15,-8)}
- if(id===101){r(5,30,WD,0,6);r(13,15,DI,0,-12)}
- if(id===102){r(5,34,WD,0,4);r(13,12,DI,6,-10);r(4,14,DK,12,-10)}
- if(id===103){r(4,10,WD,0,16);r(16,4,'#3b2a1a',0,10);r(7,30,DI,0,-6);r(3,26,'#d8fffc',0,-6)}
- if(id===104){x.strokeStyle=WD;x.lineWidth=5;x.beginPath();x.arc(14,0,20,Math.PI*.7,Math.PI*1.3);x.stroke();x.strokeStyle='#fff';x.lineWidth=1.5;x.beginPath();x.moveTo(-2,-12);x.lineTo(-2,12);x.stroke();r(26,2,'#d9c3a0',4,0);r(5,5,'#9aa5ae',17,0)}
+const toolTip=id=>isTool(id)?`${TOOL[id].e} ${TOOL[id].n} – ${TOOL[id].d}`:itemName(id);
+// each tool is 16x16 pixel art, like real Minecraft tools: the same picture is used for the hotbar icon,
+// and it is pushed out into little 3D blocks for the one Kaden holds
+const TPAL={o:'#1d1410',O:'#0b3532',w:'#a8743c',m:'#7d5326',W:'#553514',l:'#d9fffb',d:'#5fe8e0',D:'#25aaa3',k:'#147a75',s:'#f2f2f2',g:'#c9cfd6',G:'#7d8893',f:'#ffffff',F:'#d64545'};
+const TPIX={};
+(function(){
+ const grid=()=>Array.from({length:16},()=>Array(16).fill(''));
+ // a diagonal handle from the bottom-left going up-right, with a woodgrain stripe
+ const handle=(g,n)=>{for(let t=0;t<n;t++){const x=1+t,y=14-t;g[y][x]=t%3===0?'W':t%3===1?'m':'w';if(t<n-1)g[y][x+1]=g[y][x+1]||'m'}};
+ const along=(x,y,cx,cy)=>((x-cx)-(y-cy))/Math.SQRT2,across=(x,y,cx,cy)=>((x-cx)+(y-cy))/Math.SQRT2;
+ const outline=g=>{const o=grid();for(let y=0;y<16;y++)for(let x=0;x<16;x++){if(g[y][x])continue;let n='';[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const c=(g[y+b]||[])[x+a];if(c&&!n)n=c});if(n)o[y][x]='lldDk'.includes(n)?'O':'o'}
+  for(let y=0;y<16;y++)for(let x=0;x<16;x++)if(o[y][x])g[y][x]=o[y][x];return g};
+ let g;
+ // pickaxe: a curved diamond head across the top
+ g=grid();handle(g,11);
+ for(let y=0;y<16;y++)for(let x=0;x<16;x++){const dx=x+.5-1.5,dy=14.5-(y+.5),d=Math.hypot(dx,dy),an=Math.atan2(dy,dx)*180/Math.PI;if(d>=10.4&&d<=12.9&&an>=12&&an<=78){const tip=an<20||an>70;g[y][x]=tip?'D':d>12?'l':d>11.2?'d':'D'}}
+ TPIX[100]=outline(g);
+ // shovel: a rounded diamond spade at the top
+ g=grid();handle(g,9);
+ for(let y=0;y<16;y++)for(let x=0;x<16;x++){const a=along(x+.5,y+.5,11.6,4.4),c=across(x+.5,y+.5,11.6,4.4);if((a/3.5)**2+(c/2.5)**2<=1)g[y][x]=c<-.9?'l':c>1?'D':'d'}
+ [[9,6],[10,6],[9,7]].forEach(([x,y])=>g[y][x]='k');
+ TPIX[101]=outline(g);
+ // axe: a wide diamond blade on one side of the handle
+ g=grid();handle(g,12);
+ for(let y=0;y<16;y++)for(let x=0;x<16;x++){const a=along(x+.5,y+.5,10.5,4.5),c=across(x+.5,y+.5,10.5,4.5);if(c<-.6&&c>-4.6&&Math.abs(a-.6)<=1.3+.42*(-c))g[y][x]=c<-3.6?'l':c<-2?'d':'D'}
+ TPIX[102]=outline(g);
+ // sword: a long shiny blade, a crossguard and a grip
+ g=grid();
+ for(let t=0;t<10;t++){const x=5+t,y=10-t;g[y][x]=t>8?'l':'d';if(t<9){g[y-1][x]='l';g[y][x+1]=g[y][x+1]||'D'}}
+ for(let k=-2;k<=2;k++){g[11+k][4+k]='k'}g[12][2+1]='W';g[13][2]='m';g[12][3]='W';g[13][3]='W';g[14][1]='k';g[14][2]='k';g[13][1]='k';g[12][2]='m';
+ TPIX[103]=outline(g);
+ // bow: a curved wooden bow, a string and an arrow ready to go
+ g=grid();
+ for(let y=0;y<16;y++)for(let x=0;x<16;x++){const d=Math.hypot(x+.5-13,y+.5-13);if(d>=9.6&&d<=11.2&&x<=13&&y<=13)g[y][x]=d>10.6?'W':'w'}
+ for(let t=0;t<11;t++){const x=3+t,y=13-t;if(!g[y][x])g[y][x]='s'}
+ for(let t=0;t<10;t++){const x=12-t,y=12-t;g[y][x]=t<2?'F':t>7?'G':'m'}g[2][3]='g';g[3][2]='g';g[13][12]='F';g[12][13]='F';
+ TPIX[104]=outline(g);
+})();
+function toolMesh(id){const pix=TPIX[id],S=1/16,pos=[],nor=[],col=[],c=new THREE.Color(),has=(x,y)=>x>=0&&y>=0&&x<16&&y<16&&pix[y][x];
+ const quad=(pts,n,cc)=>{const[a,b,c2,d]=pts;[a,b,c2,a,c2,d].forEach(p=>{pos.push(...p);nor.push(...n);col.push(cc.r,cc.g,cc.b)})};
+ for(let y=0;y<16;y++)for(let x=0;x<16;x++){const k=pix[y][x];if(!k)continue;c.set(TPAL[k]);const x0=(x-8)*S,x1=x0+S,y1=(8-y)*S,y0=y1-S,z0=-S/2,z1=S/2;
+  quad([[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]],[0,0,1],c);quad([[x1,y0,z0],[x0,y0,z0],[x0,y1,z0],[x1,y1,z0]],[0,0,-1],c);
+  const e=c.clone().multiplyScalar(.75);
+  if(!has(x-1,y))quad([[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0]],[-1,0,0],e);
+  if(!has(x+1,y))quad([[x1,y0,z1],[x1,y0,z0],[x1,y1,z0],[x1,y1,z1]],[1,0,0],e);
+  if(!has(x,y-1))quad([[x0,y1,z1],[x1,y1,z1],[x1,y1,z0],[x0,y1,z0]],[0,1,0],c);
+  if(!has(x,y+1))quad([[x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1]],[0,-1,0],e)}
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+ const m=new THREE.Mesh(geo,TOOLMAT);const g=new THREE.Group();g.add(m);return g}
+const TOOLMAT=new THREE.MeshLambertMaterial({vertexColors:true});
+// a little picture of each tool for the hotbar and the menu (the same pixels)
+function toolIcon(id){const c=document.createElement('canvas');c.width=c.height=48;const x=c.getContext('2d'),pix=TPIX[id];
+ for(let r=0;r<16;r++)for(let q=0;q<16;q++){const k=pix[r][q];if(!k)continue;x.fillStyle=TPAL[k];x.fillRect(q*3,r*3,3,3)}
  return c.toDataURL()}
 Object.keys(TOOL).forEach(id=>ICON[id]=toolIcon(+id));
 function blockGeo(id){const bd=B[id],p=[],u=[],c=[],ix=[];FACES.forEach((F,f)=>{const ti=f===3?bd.t[0]:f===2?bd.t[2]:bd.t[1],tx=ti%COLS,ty=Math.floor(ti/COLS),n0=p.length/3;
@@ -407,7 +444,7 @@ const heldG=new THREE.Group();hudCam.add(heldG);const armG=new THREE.Group();hel
 armG.rotation.set(.45,.32,0);
 let itemM=null,swing=0;
 function updateHand(){if(itemM){heldG.remove(itemM);itemM=null}const id=G.hot[G.sel];
- if(isTool(id)){itemM=toolMesh(id);itemM.scale.setScalar(.5);itemM.position.set(-.07,.16,-.3);itemM.rotation.set(-.35,.25,id===104?.1:.5)}
+ if(isTool(id)){itemM=toolMesh(id);itemM.scale.setScalar(.4);if(id===104){itemM.position.set(.02,.1,-.34);itemM.rotation.set(.1,2.6,-.35)}else{itemM.position.set(-.04,.24,-.34);itemM.rotation.set(.15,2.79,.5)}}
  else{itemM=new THREE.Mesh(blockGeo(id),B[id].water?waterMat:solidMat);itemM.scale.setScalar(.22);itemM.position.set(-.08,.17,-.31);itemM.rotation.set(.25,.8,0)}
  heldG.add(itemM)}
 
@@ -460,11 +497,11 @@ $('fly').onclick=toggleFly;$('fly').classList.toggle('on',flying);$('down').hidd
 
 /* ---------- hotbar and the menu of tools and blocks ---------- */
 function renderHot(){$('hot').innerHTML=G.hot.map((id,k)=>`<button class="slot ${k===G.sel?'on':''}" data-k="${k}" aria-label="${itemName(id)}"><img src="${ICON[id]}" alt=""></button>`).join('');updateHand()}
-$('hot').onclick=e=>{const s=e.target.closest('[data-k]');if(!s)return;G.sel=+s.dataset.k;renderHot();sfx.pop();toast(itemName(G.hot[G.sel]))};
+$('hot').onclick=e=>{const s=e.target.closest('[data-k]');if(!s)return;G.sel=+s.dataset.k;renderHot();sfx.pop();toast(toolTip(G.hot[G.sel]))};
 $('bgrid').innerHTML='<div class="sect">🛠️ Tools</div>'+Object.keys(TOOL).map(i=>`<button class="btn blk" data-b="${i}"><img src="${ICON[i]}" alt="">${TOOL[i].n}</button>`).join('')+
  '<div class="sect">🧱 Blocks</div>'+B.map((b,i)=>b&&!b.hard?`<button class="btn blk" data-b="${i}"><img src="${ICON[i]}" alt="">${b.n}</button>`:'').join('');
 $('bag').onclick=()=>{$('blocks').hidden=false;sfx.pop()};$('bclose').onclick=()=>$('blocks').hidden=true;
-$('bgrid').onclick=e=>{const b=e.target.closest('[data-b]');if(!b)return;const id=+b.dataset.b,have=G.hot.indexOf(id);if(have>=0)G.sel=have;else G.hot[G.sel]=id;renderHot();sfx.pop();$('blocks').hidden=true;toast(itemName(id)+' in your hand')};
+$('bgrid').onclick=e=>{const b=e.target.closest('[data-b]');if(!b)return;const id=+b.dataset.b,have=G.hot.indexOf(id);if(have>=0)G.sel=have;else G.hot[G.sel]=id;renderHot();sfx.pop();$('blocks').hidden=true;toast(isTool(id)?toolTip(id):itemName(id)+' in your hand')};
 let toastT=0;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');toastT=2.2}
 
 /* ---------- slimes to bonk, friendly animals, and arrows ---------- */
